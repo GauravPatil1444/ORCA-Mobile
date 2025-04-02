@@ -1,5 +1,5 @@
 import { View, TextInput, Dimensions, Image, TouchableOpacity, StatusBar, KeyboardAvoidingView, FlatList, Text, ScrollView } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -7,9 +7,18 @@ const ChatScreen = () => {
     const [searchinp, setsearchinp] = useState('');
     const [chatData, setchatData] = useState<{ type: string; content: string }[]>([]);
     const [edit, setedit] = useState(true);
+    const list = useRef<any>(null);
 
     useEffect(() => {
         setsearchinp('');
+    }, [chatData]);
+
+    useEffect(() => {
+        if (chatData.length > 0) {
+          setTimeout(() => {
+            list.current?.scrollToOffset({ offset: 99999, animated: true });
+          }, 100);
+        }
     }, [chatData]);
 
     useFocusEffect(
@@ -21,7 +30,7 @@ const ChatScreen = () => {
 
     const requestorca = async (inp: string) => {
         try {
-            const response = await fetch("https://bdd2-202-160-145-182.ngrok-free.app/search", {
+            const response = await fetch("https://c806-202-160-145-185.ngrok-free.app/search", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -51,6 +60,7 @@ const ChatScreen = () => {
                 {chatData.length!=0?<FlatList
                     style={styles.chatContainer}
                     data={chatData}
+                    ref={list}
                     initialNumToRender={10}
                     maxToRenderPerBatch={10}
                     keyExtractor={(item, index) => index.toString()}
