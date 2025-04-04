@@ -30,7 +30,7 @@ const ChatScreen = () => {
 
     const requestorca = async (inp: string) => {
         try {
-            const response = await fetch("https://c806-202-160-145-185.ngrok-free.app/search", {
+            const response = await fetch("https://c7c1-2409-40c2-3053-aea9-75da-2e38-8b5b-7957.ngrok-free.app/search", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

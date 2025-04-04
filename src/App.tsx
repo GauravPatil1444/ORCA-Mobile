@@ -7,7 +7,7 @@ import ChatScreen from './components/ChatScreen';
 import { createDrawerNavigator, DrawerItemList } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { DrawerActions } from '@react-navigation/native';
-import Configurator from './components/Configurator';
+import ModelSelector from './components/ModelSelector';
 
 const Drawer = createDrawerNavigator();
 
@@ -77,8 +77,8 @@ const App = () => {
           })}
         />
         <Drawer.Screen
-          name="Configurator"
-          component={Configurator}
+          name="ModelSelector"
+          component={ModelSelector}
           options={({ navigation }) => ({
             title:'Build Tools',
             headerStyle: {
