@@ -1,14 +1,19 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useState } from 'react'
+import { useNavigation } from '@react-navigation/native'
+import { DrawerActions } from '@react-navigation/native'
 
 const ModelSelector = () => {
 
   const [Modeltype, setModeltype] = useState<string|null>()
 
+  const navigation = useNavigation();
+
   const HandleNext = async()=>{
     if(Modeltype!=null){
       console.log(Modeltype);
+      navigation.dispatch(DrawerActions.jumpTo(Modeltype))
     }
     else{
       console.log("Select Model type first!");
@@ -21,7 +26,7 @@ const ModelSelector = () => {
 
       <Text style={{ color: '#192A56', fontSize: 20, fontWeight: 'bold', marginTop:10 }}>Select Model Type</Text>        
 
-      <TouchableOpacity style={[styles.filepicker,{backgroundColor:Modeltype=="Document"?'rgba(135, 207, 235, 0.26)':'rgba(135, 207, 235, 0.2)',borderColor:Modeltype=="Document"?'#0073FF':'rgba(135, 207, 235, 0.2)'}]} onPress={()=>{setModeltype("Document")}}>
+      <TouchableOpacity style={[styles.filepicker,{backgroundColor:Modeltype=="DocumentModel"?'rgba(135, 207, 235, 0.26)':'rgba(135, 207, 235, 0.2)',borderColor:Modeltype=="DocumentModel"?'#0073FF':'rgba(135, 207, 235, 0.2)'}]} onPress={()=>{setModeltype("DocumentModel")}}>
 
         <Text style={{ color: '#192A56', fontSize: 15, fontWeight: 'bold' }}>Document Model</Text>        
 
@@ -36,7 +41,7 @@ const ModelSelector = () => {
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.filepicker,{padding:25,height:'auto',backgroundColor:Modeltype=="URL"?'rgba(135, 207, 235, 0.26)':'rgba(135, 207, 235, 0.2)',borderColor:Modeltype=="URL"?'#0073FF':'rgba(135, 207, 235, 0.2)'}]} onPress={()=>{setModeltype("URL")}}>
+      <TouchableOpacity style={[styles.filepicker,{padding:25,height:'auto',backgroundColor:Modeltype=="URLmodel"?'rgba(135, 207, 235, 0.26)':'rgba(135, 207, 235, 0.2)',borderColor:Modeltype=="URLmodel"?'#0073FF':'rgba(135, 207, 235, 0.2)'}]} onPress={()=>{setModeltype("URLmodel")}}>
 
         <Text style={{ color: '#192A56', fontSize: 15, fontWeight: 'bold' }}>URL Model</Text>        
 

@@ -8,8 +8,18 @@ const DocumentModel = () => {
 
   const [filename, setfilename] = useState<string|null>('');
   const [fileexists, setfileexists] = useState(false);
+  const [pdfpath, setpdfpath] = useState<string>('');
 
   const Filepicker = async()=>{
+    if(pdfpath!=""){
+      try{
+        await RNFS.unlink(RNFS.DocumentDirectoryPath+"/"+pdfpath);
+        console.log("previous one deleted!");
+      }
+      catch(e){
+        console.log(e);
+      }
+    }
     setfileexists(false);
     setfilename('');
     try {
@@ -28,6 +38,7 @@ const DocumentModel = () => {
         setfileexists(true);
         const path = copyResult.localUri.split('files/')[1].split('/')[0]+"/"+name;
         console.log(path);
+        setpdfpath(path);
         // RNFS.unlink(path);
         
         
@@ -48,8 +59,50 @@ const DocumentModel = () => {
     }
   }
 
-  const process = async()=>{
+  const getMimeType = (filename: string | null) => {
+    if (!filename) return 'application/octet-stream';
+    const ext = filename.split('.').pop()?.toLowerCase();
+    switch (ext) {
+      case 'pdf': return 'application/pdf';
+      case 'json': return 'application/json';
+      case 'csv': return 'text/csv';
+      case 'jpg':
+      case 'jpeg': return 'image/jpeg';
+      case 'png': return 'image/png';
+      default: return 'application/octet-stream';
+    }
+  };
 
+  const process = async()=>{
+    const dir = RNFS.DocumentDirectoryPath+"/"+pdfpath;
+    // console.log(docs);
+    try {
+      const formData = new FormData();
+  
+      formData.append('file', {
+        uri: `file://${dir}`, // prepend file:// on Android
+        name: filename,
+        type: getMimeType(filename), // detect content-type
+      });
+      
+      formData.append('collection_name', 'sample');
+
+      const response = await fetch('https://bde6-202-160-145-173.ngrok-free.app/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      const result = await response.json();
+      console.log(result);
+      RNFS.unlink(dir);
+    } 
+    catch (err) {
+      console.error(err);
+      RNFS.unlink(dir);
+    }
   }
 
   return (

@@ -8,6 +8,8 @@ import { createDrawerNavigator, DrawerItemList } from '@react-navigation/drawer'
 import { NavigationContainer } from '@react-navigation/native';
 import { DrawerActions } from '@react-navigation/native';
 import ModelSelector from './components/ModelSelector';
+import DocumentModel from './components/DocumentModel';
+import URLmodel from './components/URLmodel';
 
 const Drawer = createDrawerNavigator();
 
@@ -48,6 +50,26 @@ const App = () => {
         <Drawer.Screen 
           name="SplashScreen" 
           component={SplashScreen}
+          options={{
+            headerShown:false,
+            drawerItemStyle:{
+              display:'none',
+            }
+          }}
+         />
+         <Drawer.Screen 
+          name="DocumentModel" 
+          component={DocumentModel}
+          options={{
+            headerShown:false,
+            drawerItemStyle:{
+              display:'none',
+            }
+          }}
+         />
+         <Drawer.Screen 
+          name="URLmodel" 
+          component={URLmodel}
           options={{
             headerShown:false,
             drawerItemStyle:{
