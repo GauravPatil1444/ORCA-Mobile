@@ -2,16 +2,26 @@ import { View, TextInput, Dimensions, Image, TouchableOpacity, StatusBar, Keyboa
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { DrawerParamList } from '../App';
 
-const ChatScreen = () => {
+type DrawerProps = DrawerScreenProps<DrawerParamList,'ChatScreen'>;
+
+const ChatScreen = ({route}:DrawerProps) => {
     const [searchinp, setsearchinp] = useState('');
     const [chatData, setchatData] = useState<{ type: string; content: string }[]>([]);
     const [edit, setedit] = useState(true);
     const list = useRef<any>(null);
+    const [model, setmodel] = useState<string|undefined>('')
 
     useEffect(() => {
         setsearchinp('');
     }, [chatData]);
+
+    useEffect(() => {
+        setmodel(route.params?.model);
+        console.log(route.params?.model);
+    }, [route.params]);
 
     useEffect(() => {
         if (chatData.length > 0) {
@@ -30,13 +40,13 @@ const ChatScreen = () => {
 
     const requestorca = async (inp: string) => {
         try {
-            const response = await fetch("https://c7c1-2409-40c2-3053-aea9-75da-2e38-8b5b-7957.ngrok-free.app/search", {
+            const response = await fetch("https://e88d-202-160-145-173.ngrok-free.app/search", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ "data": inp, "collection_name": "SMART" })
+                body: JSON.stringify({ "data": inp, "collection_name": model })
             });
             const res = await response.json();
             setchatData(prevChatData => [...prevChatData, { "type": "system", "content": res["response"] }]);
@@ -84,7 +94,7 @@ const ChatScreen = () => {
                     <TextInput
                         editable={edit}
                         style={styles.inputField}
-                        placeholder="Message ORCA"
+                        placeholder={`Message ${model}`} 
                         placeholderTextColor="rgba(39, 39, 39, 0.76)"
                         cursorColor="rgba(39, 39, 39, 0.76)"
                         enterKeyHint='search'
@@ -113,6 +123,7 @@ const styles = StyleSheet.create({
     },
     messageContainer: {
         // flex: 1,
+        paddingLeft:10,
         height: Dimensions.get('window').height - Dimensions.get('window').height / 6,
     },
     inputContainer: {
@@ -132,7 +143,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         fontSize: 16,
         fontWeight: 'bold',
-        color: 'rgba(39, 39, 39, 0.76)',
+        color: 'black',
         marginRight: 10,
     },
     sendbtn: {
@@ -155,9 +166,10 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     systemContent: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
         alignItems: 'center',
         marginBottom: 15,
+        // backgroundColor:'pink'
     },
     userText: {
         padding: 10,
