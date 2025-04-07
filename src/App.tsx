@@ -69,6 +69,10 @@ const App = () => {
               {/* <DrawerItemList {...props} /> */}
               <View style={{height:'72%', alignItems: 'center', gap:10 }}>
                 <TouchableOpacity style={styles.DrawerTabs} onPress={()=>{props.navigation.dispatch(DrawerActions.jumpTo('ModelSelector'))}}>
+                  <Image
+                    style={{ width: 20, height: 20}}
+                    source={require("./assets/build.png")}
+                  />
                   <Text style={styles.DrawerTabText}>Build Tools</Text>
                 </TouchableOpacity>
                 {models.length != 0 && <FlatList
@@ -80,6 +84,10 @@ const App = () => {
                   keyExtractor={(item, index) => index.toString()}
                   renderItem={({ item }) => (
                   <TouchableOpacity style={styles.DrawerTabs} onPress={()=>{props.navigation.dispatch(DrawerActions.jumpTo('ChatScreen',{"model":item}))}}>
+                    <Image
+                      style={{ width: 20, height: 20}}
+                      source={require("./assets/bot.png")}
+                    />
                     <Text style={styles.DrawerTabText}>{item}</Text>
                   </TouchableOpacity>
                   )}

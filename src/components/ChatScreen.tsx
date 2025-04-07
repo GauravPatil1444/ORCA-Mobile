@@ -40,7 +40,7 @@ const ChatScreen = ({route}:DrawerProps) => {
 
     const requestorca = async (inp: string) => {
         try {
-            const response = await fetch("https://e88d-202-160-145-173.ngrok-free.app/search", {
+            const response = await fetch("https://2b7a-202-160-145-173.ngrok-free.app/search", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

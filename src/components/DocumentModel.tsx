@@ -1,10 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Switch } from 'react-native'
 import React from 'react'
 import { pick, keepLocalCopy, types } from '@react-native-documents/picker'
 import RNFS from 'react-native-fs';
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerActions } from '@react-navigation/native';
+import Slider from '@react-native-community/slider';
 
 const DocumentModel = () => {
 
@@ -12,6 +13,10 @@ const DocumentModel = () => {
   const [fileexists, setfileexists] = useState(false);
   const [pdfpath, setpdfpath] = useState<string>('');
   const [model, setmodel] = useState<string>('');
+  const [range, setrange] = useState(500);
+  const [overlap, setoverlap] = useState(0);
+  const [regex, setregex] = useState(false);
+  const [expression, setexpression] = useState<string>('')
 
   const navigation = useNavigation();
 
@@ -44,20 +49,6 @@ const DocumentModel = () => {
         const path = copyResult.localUri.split('files/')[1].split('/')[0] + "/" + name;
         console.log(path);
         setpdfpath(path);
-        // RNFS.unlink(path);
-
-
-
-        // const files = await RNFS.readDir(RNFS.DocumentDirectoryPath+"/d278039f-2303-4f09-af91-03a071dc4144");
-        // console.log(files[0].path);
-        // try{
-        //   const filePath = "/data/user/0/com.orca/files/d278039f-2303-4f09-af91-03a071dc4144";
-        //   const content = await RNFS.readFile(filePath, 'utf8');
-        //   console.log("File Content:", content);
-        // }
-        // catch(e){
-        //   console.log(e);
-        // }
       }
     } catch (err) {
       // see error handling
@@ -91,8 +82,12 @@ const DocumentModel = () => {
       });
 
       formData.append('collection_name', model);
+      formData.append('pdfoption', regex?"adv":"");
+      formData.append('range', range);
+      formData.append('overlap', overlap);
+      formData.append('regex', expression);
 
-      const response = await fetch('https://e88d-202-160-145-173.ngrok-free.app/upload', {
+      const response = await fetch('https://2b7a-202-160-145-173.ngrok-free.app/upload', {
         method: 'POST',
         body: formData,
         headers: {
@@ -153,6 +148,14 @@ const DocumentModel = () => {
         </View>
         <Text style={{ color: '#192A56', fontSize: 15, fontWeight: 'bold' }}>{filename}</Text>
       </View>
+      {filename?.split('.')[1]=="pdf" && <View style={{flexDirection:'row',alignItems:'center'}}>
+        <Text>Enable Regex : </Text>
+        <Switch
+          value={regex}
+          onChange={()=>{setregex(!regex)}}
+          trackColor={{true:'#0073FF',false:'#0073FF'}}
+        />
+      </View>}
       {fileexists && <><TextInput
         style={styles.inputField}
         placeholder="Set Model name"
@@ -164,6 +167,49 @@ const DocumentModel = () => {
         value={model}
         onChangeText={setmodel}
       />
+      {regex && <TextInput
+        style={styles.inputField}
+        placeholder="Enter Regular Expression"
+        placeholderTextColor="rgba(39, 39, 39, 0.76)"
+        cursorColor="rgba(39, 39, 39, 0.76)"
+        enterKeyHint='done'
+        returnKeyType='done'
+        inputMode='search'
+        value={expression}
+        onChangeText={setexpression}
+      />}
+
+      {regex==false && <> 
+      <View style={{width:'100%', flexDirection:'column',alignItems:'center'}}>
+        <Text style={{marginBottom:-10}}>Chunk size</Text>
+        
+        <Slider
+          minimumValue={500}
+          maximumValue={1500}
+          onSlidingComplete={()=>{setrange}}
+          value={range}
+          step={500} 
+          renderStepNumber={true}
+          minimumTrackTintColor='#0073FF'
+          maximumTrackTintColor='#0073FF'
+          style={{width:'75%', height:60}}
+        />
+    
+        <Text style={{marginBottom:-10, marginTop:10}}>Chunk Overlap size</Text>
+        <Slider
+          minimumValue={0}
+          maximumValue={250}
+          onSlidingComplete={()=>{setoverlap}}
+          value={overlap}
+          step={50} 
+          renderStepNumber={true}
+          minimumTrackTintColor='#0073FF'
+          maximumTrackTintColor='#0073FF'
+          style={{width:'75%', height:60}}
+        />
+
+      </View>
+      </>}
       <TouchableOpacity style={[styles.btn, { backgroundColor: 'rgba(69, 255, 85, 0.2)', width: '30%', height: 'auto' }]} onPress={() => { HandleProcess() }}>
         <Text style={{ color: '#192A56', fontSize: 15, fontWeight: 'bold' }}>Confirm</Text>
       </TouchableOpacity></>}
