@@ -4,19 +4,19 @@ import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { DrawerActions } from '@react-navigation/native'
 
-const ModelSelector = () => {
+const AgentSelector = () => {
 
-  const [Modeltype, setModeltype] = useState<string|null>()
+  const [Agenttype, setAgenttype] = useState<string|null>()
 
   const navigation = useNavigation();
 
   const HandleNext = async()=>{
-    if(Modeltype!=null){
-      console.log(Modeltype);
-      navigation.dispatch(DrawerActions.jumpTo(Modeltype))
+    if(Agenttype!=null){
+      console.log(Agenttype);
+      navigation.dispatch(DrawerActions.jumpTo(Agenttype))
     }
     else{
-      console.log("Select Model type first!");
+      console.log("Select Agent type first!");
     }
   }
 
@@ -24,11 +24,11 @@ const ModelSelector = () => {
   return (
     <View style={{ flex: 1, alignItems: 'center', gap: 15 }}>
 
-      <Text style={{ color: '#192A56', fontSize: 20, fontWeight: 'bold', marginTop:10 }}>Select Model Type</Text>        
+      <Text style={{ color: '#192A56', fontSize: 20, fontWeight: 'bold', marginTop:10 }}>Select Agent Type</Text>        
 
-      <TouchableOpacity style={[styles.filepicker,{backgroundColor:Modeltype=="DocumentModel"?'rgba(135, 207, 235, 0.26)':'rgba(135, 207, 235, 0.2)',borderColor:Modeltype=="DocumentModel"?'#0073FF':'rgba(135, 207, 235, 0.2)'}]} onPress={()=>{setModeltype("DocumentModel")}}>
+      <TouchableOpacity style={[styles.filepicker,{backgroundColor:Agenttype=="DocumentAgent"?'rgba(135, 207, 235, 0.26)':'rgba(135, 207, 235, 0.2)',borderColor:Agenttype=="DocumentAgent"?'#0073FF':'rgba(135, 207, 235, 0.2)'}]} onPress={()=>{setAgenttype("DocumentAgent")}}>
 
-        <Text style={{ color: '#192A56', fontSize: 15, fontWeight: 'bold' }}>Document Model</Text>        
+        <Text style={{ color: '#192A56', fontSize: 15, fontWeight: 'bold' }}>Document Agent</Text>        
 
         <View style={{ alignItems: 'center', flexDirection: 'row', gap: 5 }}>
 
@@ -41,9 +41,9 @@ const ModelSelector = () => {
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.filepicker,{padding:25,height:'auto',backgroundColor:Modeltype=="URLmodel"?'rgba(135, 207, 235, 0.26)':'rgba(135, 207, 235, 0.2)',borderColor:Modeltype=="URLmodel"?'#0073FF':'rgba(135, 207, 235, 0.2)'}]} onPress={()=>{setModeltype("URLmodel")}}>
+      <TouchableOpacity style={[styles.filepicker,{padding:25,height:'auto',backgroundColor:Agenttype=="URLAgent"?'rgba(135, 207, 235, 0.26)':'rgba(135, 207, 235, 0.2)',borderColor:Agenttype=="URLAgent"?'#0073FF':'rgba(135, 207, 235, 0.2)'}]} onPress={()=>{setAgenttype("URLAgent")}}>
 
-        <Text style={{ color: '#192A56', fontSize: 15, fontWeight: 'bold' }}>URL Model</Text>        
+        <Text style={{ color: '#192A56', fontSize: 15, fontWeight: 'bold' }}>URL Agent</Text>        
 
         <View style={{ alignItems: 'center', flexDirection: 'column', gap: 5 }}>
 
@@ -93,4 +93,4 @@ const styles = StyleSheet.create({
 
 })
 
-export default ModelSelector
+export default AgentSelector

@@ -7,32 +7,32 @@ import ChatScreen from './components/ChatScreen';
 import { createDrawerNavigator, DrawerItemList } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { DrawerActions } from '@react-navigation/native';
-import ModelSelector from './components/ModelSelector';
-import DocumentModel from './components/DocumentModel';
-import URLmodel from './components/URLmodel';
+import AgentSelector from './components/AgentSelector';
+import DocumentAgent from './components/DocumentAgent';
+import URLAgent from './components/URLAgent';
 import { useState, useEffect } from 'react';
 import RNFS from 'react-native-fs';
 
 
 export type DrawerParamList = {
-  ChatScreen: { "model": string } | undefined;
+  ChatScreen: { "Agent": string, "prompt" :string} | undefined;
   SplashScreen: undefined;
-  DocumentModel: undefined;
-  URLmodel: undefined;
-  ModelSelector: undefined;
+  DocumentAgent: { "Agent": string, "prompt" :string} | undefined;
+  URLAgent: undefined;
+  AgentSelector: undefined;
 }
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
 const App = () => {
 
-  const [models, setmodels] = useState<string[]>([]);
+  const [Agents, setAgents] = useState<string[]>([]);
 
   const startup = async () => {
-    const path = RNFS.DocumentDirectoryPath + '/models.txt';
+    const path = RNFS.DocumentDirectoryPath + '/Agents.txt';
     const data = await RNFS.readFile(path, 'utf8');
-    const models = await JSON.parse(data);
-    setmodels(models["models"]);
+    const Agents = await JSON.parse(data);
+    setAgents(Agents);
   }
 
   useEffect(() => {
@@ -68,27 +68,27 @@ const App = () => {
               </View>
               {/* <DrawerItemList {...props} /> */}
               <View style={{height:'72%', alignItems: 'center', gap:10 }}>
-                <TouchableOpacity style={styles.DrawerTabs} onPress={()=>{props.navigation.dispatch(DrawerActions.jumpTo('ModelSelector'))}}>
+                <TouchableOpacity style={styles.DrawerTabs} onPress={()=>{props.navigation.dispatch(DrawerActions.jumpTo('AgentSelector'))}}>
                   <Image
                     style={{ width: 20, height: 20}}
                     source={require("./assets/build.png")}
                   />
                   <Text style={styles.DrawerTabText}>Build Tools</Text>
                 </TouchableOpacity>
-                {models.length != 0 && <FlatList
+                {Agents.length != 0 && <FlatList
                   style={{width:'100%',paddingLeft:10}}
                   contentContainerStyle={{gap:10,width:'95%'}}
-                  data={models}
+                  data={Agents}
                   initialNumToRender={10}
                   maxToRenderPerBatch={10}
                   keyExtractor={(item, index) => index.toString()}
-                  renderItem={({ item }) => (
-                  <TouchableOpacity style={styles.DrawerTabs} onPress={()=>{props.navigation.dispatch(DrawerActions.jumpTo('ChatScreen',{"model":item}))}}>
+                  renderItem={({ item }:any) => (
+                  <TouchableOpacity style={styles.DrawerTabs} onPress={()=>{props.navigation.dispatch(DrawerActions.jumpTo('ChatScreen',{"Agent":item["Agent"],"prompt":item["prompt"]}))}}>
                     <Image
                       style={{ width: 20, height: 20}}
                       source={require("./assets/bot.png")}
                     />
-                    <Text style={styles.DrawerTabText}>{item}</Text>
+                    <Text style={styles.DrawerTabText}>{item.Agent}</Text>
                   </TouchableOpacity>
                   )}
                 />}
@@ -101,8 +101,8 @@ const App = () => {
         }}
       >
         <Drawer.Screen
-          name="ModelSelector"
-          component={ModelSelector}
+          name="AgentSelector"
+          component={AgentSelector}
           options={({ navigation }) => ({
             title: 'Build Tools',
             headerStyle: {
@@ -132,8 +132,8 @@ const App = () => {
           }}
         />
         <Drawer.Screen
-          name="DocumentModel"
-          component={DocumentModel}
+          name="DocumentAgent"
+          component={DocumentAgent}
           options={{
             headerShown: false,
             drawerItemStyle: {
@@ -142,8 +142,8 @@ const App = () => {
           }}
         />
         <Drawer.Screen
-          name="URLmodel"
-          component={URLmodel}
+          name="URLAgent"
+          component={URLAgent}
           options={{
             headerShown: false,
             drawerItemStyle: {
@@ -155,7 +155,7 @@ const App = () => {
           name="ChatScreen"
           component={ChatScreen}
           options={({ navigation, route }) => ({
-            title: route.params?.model,
+            title: route.params?.Agent,
             headerStyle: {
               backgroundColor: 'white'
             },
@@ -165,8 +165,16 @@ const App = () => {
             headerLeft: () => (
               <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())} style={{ marginLeft: 15 }}>
                 <Image
-                  style={{ width: 25, height: 25, marginRight: 15, tintColor: 'rgb(39, 39, 39)' }}
+                  style={{ width: 25, height: 25, marginRight: 15, tintColor: '#192A56' }}
                   source={require("./assets/menu.png")}
+                />
+              </TouchableOpacity>
+            ),
+            headerRight: ()=>(
+              <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.jumpTo('DocumentAgent',{"Agent":route.params?.Agent,"prompt":route.params?.prompt}))} style={{ marginLeft: 15 }}>
+                <Image
+                  style={{ width: 25, height: 25, marginRight: 15}}
+                  source={require("./assets/setting.png")}
                 />
               </TouchableOpacity>
             )

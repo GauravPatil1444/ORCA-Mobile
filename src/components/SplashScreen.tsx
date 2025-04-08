@@ -28,21 +28,21 @@ const SplashScreen = () => {
         }, 3000);
         setTimeout(async()=>{
             try{
-                const path = RNFS.DocumentDirectoryPath + '/models.txt';
+                const path = RNFS.DocumentDirectoryPath + '/Agents.txt';
                 const data = await RNFS.readFile(path,'utf8');
-                const models = await JSON.parse(data);
-                if(models["models"].length==0){
+                const Agents = await JSON.parse(data);
+                if(Agents.length==0){
                     setvisited(true);
-                    navigation.dispatch(DrawerActions.jumpTo('ModelSelector'));
+                    navigation.dispatch(DrawerActions.jumpTo('AgentSelector'));
                 }
                 else{
                     setvisited(true);
-                    navigation.dispatch(DrawerActions.jumpTo('ChatScreen',{"model":models["models"][0]}));
+                    navigation.dispatch(DrawerActions.jumpTo('ChatScreen',{"Agent":Agents[0]["Agent"],"prompt":Agents[0]["prompt"]}));
                 }
             }
             catch{
                 setvisited(true);
-                navigation.dispatch(DrawerActions.jumpTo('ModelSelector'));
+                navigation.dispatch(DrawerActions.jumpTo('AgentSelector'));
             }
         },5000)
     }

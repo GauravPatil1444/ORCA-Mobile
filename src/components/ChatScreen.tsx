@@ -12,15 +12,17 @@ const ChatScreen = ({route}:DrawerProps) => {
     const [chatData, setchatData] = useState<{ type: string; content: string }[]>([]);
     const [edit, setedit] = useState(true);
     const list = useRef<any>(null);
-    const [model, setmodel] = useState<string|undefined>('')
+    const [Agent, setAgent] = useState<string|undefined>('');
+    const [prompt, setprompt] = useState<string|undefined>('');
 
     useEffect(() => {
         setsearchinp('');
     }, [chatData]);
 
     useEffect(() => {
-        setmodel(route.params?.model);
-        console.log(route.params?.model);
+        setAgent(route.params?.Agent);
+        setprompt(route.params?.prompt);
+        console.log(route.params?.Agent);
     }, [route.params]);
 
     useEffect(() => {
@@ -40,17 +42,18 @@ const ChatScreen = ({route}:DrawerProps) => {
 
     const requestorca = async (inp: string) => {
         try {
-            const response = await fetch("https://2b7a-202-160-145-173.ngrok-free.app/search", {
+            const response = await fetch("https://149c-202-160-145-173.ngrok-free.app/search", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ "data": inp, "collection_name": model })
+                body: JSON.stringify({ "data": inp, "collection_name": Agent, "prompt": prompt })
             });
             const res = await response.json();
             setchatData(prevChatData => [...prevChatData, { "type": "system", "content": res["response"] }]);
-        } catch {
+        } catch (e){
+            // console.log(e);
             setedit(true);
         }
     };
@@ -94,7 +97,7 @@ const ChatScreen = ({route}:DrawerProps) => {
                     <TextInput
                         editable={edit}
                         style={styles.inputField}
-                        placeholder={`Message ${model}`} 
+                        placeholder={`Message ${Agent}`} 
                         placeholderTextColor="rgba(39, 39, 39, 0.76)"
                         cursorColor="rgba(39, 39, 39, 0.76)"
                         enterKeyHint='search'
