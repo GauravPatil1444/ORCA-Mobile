@@ -22,6 +22,7 @@ const ChatScreen = ({route}:DrawerProps) => {
     useEffect(() => {
         setAgent(route.params?.Agent);
         setprompt(route.params?.prompt);
+        setchatData([]);
         console.log(route.params?.Agent);
     }, [route.params]);
 
@@ -42,7 +43,7 @@ const ChatScreen = ({route}:DrawerProps) => {
 
     const requestorca = async (inp: string) => {
         try {
-            const response = await fetch("https://149c-202-160-145-173.ngrok-free.app/search", {
+            const response = await fetch("https://3b3a-202-160-145-173.ngrok-free.app/search", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

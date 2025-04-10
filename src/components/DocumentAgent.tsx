@@ -93,7 +93,7 @@ const DocumentAgent = ({route}:DrawerProps) => {
       formData.append('overlap', overlap);
       formData.append('regex', expression);
 
-      const response = await fetch('https://149c-202-160-145-173.ngrok-free.app/upload', {
+      const response = await fetch('https://3b3a-202-160-145-173.ngrok-free.app/upload', {
         method: 'POST',
         body: formData,
         headers: {
@@ -108,7 +108,7 @@ const DocumentAgent = ({route}:DrawerProps) => {
       try {
         let res = await RNFS.readFile(path, 'utf8')
         Agents = JSON.parse(res);
-        // console.log(metadata);
+        console.log(typeof(Agents),Agents);
       }
       catch {
         Agents = [];
@@ -125,9 +125,9 @@ const DocumentAgent = ({route}:DrawerProps) => {
         RNFS.unlink(dir);
       }
     }
-    catch (err) {
+    catch(e){
       setfileexists(false);
-      console.log(err);
+      console.log(e);
       RNFS.unlink(dir);
     }
   }
@@ -139,6 +139,37 @@ const DocumentAgent = ({route}:DrawerProps) => {
     }
     else{
 
+    }
+  }
+
+  const DeleteAgent = async()=>{
+    try{
+      const response = await fetch('https://3b3a-202-160-145-173.ngrok-free.app/delete', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"collection_name":Agent})
+      });
+      console.log(response);
+      const path = RNFS.DocumentDirectoryPath + '/Agents.txt';
+      let res = await RNFS.readFile(path, 'utf8')
+      let Agents = await JSON.parse(res);
+      let index:number=-1;
+      for(let i=0;i<Agents.length;i++){
+        if(Agents[i]["Agent"]===Agent){
+          index=i;
+          console.log(Agents[i]["Agent"],"deleted");
+          break;
+        }
+      }
+      Agents.splice(index,1);
+      await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
+      navigation.dispatch(DrawerActions.jumpTo('AgentSelector'))
+    }
+    catch{
+      console.log("Something went wrong!");
     }
   }
 
@@ -161,7 +192,7 @@ const DocumentAgent = ({route}:DrawerProps) => {
     <View style={{ flex: 1, alignItems: 'center', gap: 15, backgroundColor:'white' }}>
       <View style={styles.filepicker}>
         {deleteoption==false&&<TouchableOpacity style={styles.btn} onPress={() => { Filepicker() }}>
-          <Text style={{ color: '#0073FF', fontSize: 15, fontWeight: 'bold'}}>Choose file</Text>
+          <Text style={{ color: '#0073FF', fontSize: 15, fontWeight: 'bold'}}>Choose File</Text>
           <Image
             style={{ width: 20, height: 20}}
             source={require("../assets/file.png")}
@@ -170,13 +201,13 @@ const DocumentAgent = ({route}:DrawerProps) => {
         {deleteoption&&
           <View style={{width:'100%', height:'30%', alignItems:'center', gap:20, justifyContent:'center', flexDirection:'row'}}>
             <TouchableOpacity style={[styles.btn,{width:'40%',height:'80%'}]} onPress={() => { Filepicker() }}>
-              <Text style={{ color: '#0073FF', fontSize: 15, fontWeight: 'bold'}}>Choose file</Text>
+              <Text style={{ color: '#0073FF', fontSize: 15, fontWeight: 'bold'}}>Add File</Text>
               <Image
                 style={{ width: 20, height: 20}}
                 source={require("../assets/file.png")}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.btn,{width:'40%',height:'80%', backgroundColor:'rgba(255, 69, 69, 0.26)'}]} onPress={() => {}}>
+            <TouchableOpacity style={[styles.btn,{width:'40%',height:'80%', backgroundColor:'rgba(255, 69, 69, 0.26)'}]} onPress={() => {DeleteAgent()}}>
               <Text style={{ color: 'rgb(255, 0, 0)', fontSize: 15, fontWeight: 'bold'}}>Delete Agent</Text>
               <Image
                 style={{ width: 20, height: 20, tintColor:'rgb(255, 0, 0)'}}
