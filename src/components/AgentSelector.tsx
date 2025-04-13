@@ -51,7 +51,6 @@ const AgentSelector = () => {
           <View>
             <View style={[styles.filetag]}><Text style={{fontWeight:'bold'}}>🌐 Website - Organizational / Business</Text></View>
             <View style={[styles.filetag]}><Text style={{fontWeight:'bold'}}>🌐 Web Page - Article or Blog</Text></View>
-            <View style={[styles.filetag]}><Text style={{fontWeight:'bold'}}>🌐 pdf URL - Online pdf</Text></View>
           </View>
 
         </View>

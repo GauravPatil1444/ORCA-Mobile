@@ -4,26 +4,30 @@ import { StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { DrawerParamList } from '../App';
+import WebView from 'react-native-webview';
 
-type DrawerProps = DrawerScreenProps<DrawerParamList,'ChatScreen'>;
+type DrawerProps = DrawerScreenProps<DrawerParamList,'WebScreen'>;
 
-const ChatScreen = ({route}:DrawerProps) => {
+const WebScreen = ({route}:DrawerProps) => {
     const [searchinp, setsearchinp] = useState('');
-    const [chatData, setchatData] = useState<{ type: string; content: string }[]>([]);
+    const [chatData, setchatData] = useState<any>([]);
     const [edit, setedit] = useState(true);
     const list = useRef<any>(null);
-    const [Agent, setAgent] = useState<string|undefined>('');
-    const [prompt, setprompt] = useState<string|undefined>('');
+    const [Agent, setAgent] = useState<any>('');
+    const [classes_to_remove, setprompt] = useState<string|undefined>('');
+    const [invoke, setinvoke] = useState(false);
 
     useEffect(() => {
         setsearchinp('');
     }, [chatData]);
 
     useEffect(() => {
-        setAgent(route.params?.Agent);
-        setprompt(route.params?.prompt);
+        setAgent(route.params?.link);
+        setprompt(route.params?.classes_to_remove);
         setchatData([]);
-        console.log(route.params?.Agent);
+        console.log(route.params?.link);
+        // console.log();
+        setchatData([]);
         
     }, [route.params]);
 
@@ -44,18 +48,20 @@ const ChatScreen = ({route}:DrawerProps) => {
 
     const requestorca = async (inp: string) => {
         try {
-            const response = await fetch("https://1824-152-58-20-39.ngrok-free.app/search", {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ "data": inp, "collection_name": Agent, "prompt": prompt===undefined?"":prompt })
-            });
-            const res = await response.json();
-            setchatData(prevChatData => [...prevChatData, { "type": "system", "content": res["response"] }]);
+            // setqueryParams({
+            //     link: inp,
+            //     query: Agent,
+            //     classes_to_remove: classes_to_remove ?? ""
+            // });
+            setinvoke(false);
+            setTimeout(() => {
+                setinvoke(true);
+                setchatData(1);
+            }, 1000);
+            
+            // setchatData(prevChatData => [...prevChatData, { "type": "system", "content": res["response"] }]);
         } catch (e){
-            // console.log(e);
+            console.log(e);
             setedit(true);
         }
     };
@@ -63,36 +69,24 @@ const ChatScreen = ({route}:DrawerProps) => {
     const handleUserInput = async (inp: string) => {
         if(inp!=""){
             setedit(false);
-            setchatData(prevChatData => [...prevChatData, { "type": "user", "content": inp }]);
+            // setchatData(prevChatData => [...prevChatData, { "type": "user", "content": inp }]);
             await requestorca(inp);
+            setinvoke(false);
             setedit(true);
         }
     };
 
+    useEffect(() => {
+      setinvoke(false);
+    }, [searchinp])
+    
+
     return (
         <View style={styles.container}>
             <View style={styles.messageContainer}>
-                {chatData.length!=0?<FlatList
-                    style={styles.chatContainer}
-                    data={chatData}
-                    ref={list}
-                    initialNumToRender={10}
-                    maxToRenderPerBatch={10}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item }) => (
-                        <View>
-                            {item.type === "user" ? (
-                                <View style={styles.userContent}>
-                                    <Text style={styles.userText}>{item.content}</Text>
-                                </View>
-                            ) : (
-                                <View style={styles.systemContent}>
-                                    <Text style={styles.systemText}>{item.content}</Text>
-                                </View>
-                            )}
-                        </View>
-                    )}
-                />:<View style={{flex:1,paddingHorizontal:15, alignItems:'center',flexDirection:'row',gap:5}}><Text style={{fontSize:Dimensions.get('window').width/12,marginLeft:Dimensions.get('window').width/10}}>Welcome,</Text><ScrollView horizontal={true}><Text style={{color:'rgb(38, 121, 255)',fontSize:Dimensions.get('window').width/12}}>Gaurav</Text></ScrollView></View>}
+                {chatData.length!=0&&invoke?
+                    <WebView source={{ uri: `https://3b9e-2409-4081-97-c4cd-4961-2148-f5d2-5504.ngrok-free.app/owst?link=${Agent}&query=${searchinp}&classes_to_remove=${classes_to_remove} ` }} style={{ flex: 1 }} />
+                :<View style={{flex:1,paddingHorizontal:15, alignItems:'center',flexDirection:'row',gap:5}}><Text style={{fontSize:Dimensions.get('window').width/12,marginLeft:Dimensions.get('window').width/10}}>Welcome,</Text><ScrollView horizontal={true}><Text style={{color:'rgb(38, 121, 255)',fontSize:Dimensions.get('window').width/12}}>Gaurav</Text></ScrollView></View>}
             </View>
             <KeyboardAvoidingView behavior='height' enabled={true} keyboardVerticalOffset={0} style={styles.keyboardAvoidingContainer}>
                 <View style={styles.inputContainer}>
@@ -190,4 +184,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default ChatScreen;
+export default WebScreen;

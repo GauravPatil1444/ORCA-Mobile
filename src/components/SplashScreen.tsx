@@ -31,9 +31,23 @@ const SplashScreen = () => {
                 const path = RNFS.DocumentDirectoryPath + '/Agents.txt';
                 const data = await RNFS.readFile(path,'utf8');
                 const Agents = await JSON.parse(data);
+                const path1 = RNFS.DocumentDirectoryPath + '/URLAgents.txt';
+                const data1 = await RNFS.readFile(path1,'utf8');
+                const URLAgents = await JSON.parse(data1);
                 if(Agents.length==0){
-                    setvisited(true);
-                    navigation.dispatch(DrawerActions.jumpTo('AgentSelector'));
+                    if(URLAgents.length!=0){
+                        setvisited(true);
+                        if(Agents[0]["classes_to_remove"]!=="URL"){
+                            navigation.dispatch(DrawerActions.jumpTo('WebScreen',{"Agent":URLAgents[0]["Agent"],"classes_to_remove":Agents[0]["classes_to_remove"]}));
+                        }
+                        else{
+                            navigation.dispatch(DrawerActions.jumpTo('ChatScreen',{"Agent":URLAgents[0]["Agent"],"prompt":Agents[0]["classes_to_remove"]}));
+                        }
+                    }
+                    else{
+                        setvisited(true);
+                        navigation.dispatch(DrawerActions.jumpTo('AgentSelector'));
+                    }
                 }
                 else{
                     setvisited(true);

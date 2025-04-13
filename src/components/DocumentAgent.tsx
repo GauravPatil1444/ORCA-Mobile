@@ -78,57 +78,68 @@ const DocumentAgent = ({route}:DrawerProps) => {
   const process = async () => {
     const dir = RNFS.DocumentDirectoryPath + "/" + pdfpath;
     // console.log(docs);
-    try {
-      const formData = new FormData();
+    if(Agent!==""&&prompt!==""){
+      if(regex==true&&expression!=""){
 
-      formData.append('file', {
-        uri: `file://${dir}`, // prepend file:// on Android
-        name: filename,
-        type: getMimeType(filename), // detect content-type
-      });
-
-      formData.append('collection_name', Agent);
-      formData.append('pdfoption', regex?"adv":"");
-      formData.append('range', range);
-      formData.append('overlap', overlap);
-      formData.append('regex', expression);
-
-      const response = await fetch('https://3b3a-202-160-145-173.ngrok-free.app/upload', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      const result = await response.json();
-      console.log(result);
-      const path = RNFS.DocumentDirectoryPath + '/Agents.txt';
-      let Agents = [];
-      try {
-        let res = await RNFS.readFile(path, 'utf8')
-        Agents = JSON.parse(res);
-        console.log(typeof(Agents),Agents);
-      }
-      catch {
-        Agents = [];
-      }
-      finally{
-        const Agent_data = {
-          "Agent":Agent,
-          "Agent_type":"DocumentAgent",
-          "prompt":prompt
+        try {
+          const formData = new FormData();
+    
+          formData.append('file', {
+            uri: `file://${dir}`, // prepend file:// on Android
+            name: filename,
+            type: getMimeType(filename), // detect content-type
+          });
+    
+          formData.append('collection_name', Agent);
+          formData.append('pdfoption', regex?"adv":"");
+          formData.append('range', range);
+          formData.append('overlap', overlap);
+          formData.append('regex', expression);
+    
+          const response = await fetch('https://972a-2409-4081-97-c4cd-9cd3-e5d8-1868-b26b.ngrok-free.app/upload', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+    
+          const result = await response.json();
+          console.log(result);
+          const path = RNFS.DocumentDirectoryPath + '/Agents.txt';
+          let Agents = [];
+          try {
+            let res = await RNFS.readFile(path, 'utf8')
+            Agents = JSON.parse(res);
+            console.log(typeof(Agents),Agents);
+          }
+          catch {
+            Agents = [];
+          }
+          finally{
+            const Agent_data = {
+              "Agent":Agent,
+              "Agent_type":"DocumentAgent",
+              "prompt":prompt
+            }
+            Agents.splice(0,0,Agent_data);
+            await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
+            navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": Agent, "prompt": prompt}))
+            RNFS.unlink(dir);
+          }
         }
-        Agents.splice(0,0,Agent_data);
-        await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
-        navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": Agent, "prompt": prompt}))
-        RNFS.unlink(dir);
+        catch(e){
+          setfileexists(false);
+          console.log(e);
+          RNFS.unlink(dir);
+        }
+      }
+      else{
+        
       }
     }
-    catch(e){
-      setfileexists(false);
-      console.log(e);
-      RNFS.unlink(dir);
+    else{
+
     }
   }
 
@@ -144,7 +155,7 @@ const DocumentAgent = ({route}:DrawerProps) => {
 
   const DeleteAgent = async()=>{
     try{
-      const response = await fetch('https://3b3a-202-160-145-173.ngrok-free.app/delete', {
+      const response = await fetch('https://972a-2409-4081-97-c4cd-9cd3-e5d8-1868-b26b.ngrok-free.app/delete', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -168,8 +179,8 @@ const DocumentAgent = ({route}:DrawerProps) => {
       await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
       navigation.dispatch(DrawerActions.jumpTo('AgentSelector'))
     }
-    catch{
-      console.log("Something went wrong!");
+    catch(e){
+      console.log("Something went wrong!",e);
     }
   }
 
@@ -306,7 +317,7 @@ const DocumentAgent = ({route}:DrawerProps) => {
       <TouchableOpacity style={[styles.btn, { backgroundColor: 'rgba(69, 255, 85, 0.2)', width: '30%', height: 'auto' }]} onPress={() => { HandleProcess() }}>
         <Text style={{ color: 'rgb(1, 107, 10)', fontSize: 15, fontWeight: 'bold' }}>Confirm</Text>
         <Image
-          style={{ width: 20, height: 20}}
+          style={{ width: 18, height: 18, tintColor:'rgb(1, 107, 10)'}}
           source={require("../assets/tick.png")}
         />
       </TouchableOpacity></>}
