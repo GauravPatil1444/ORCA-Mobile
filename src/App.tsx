@@ -13,6 +13,7 @@ import URLAgent from './components/URLAgent';
 import WebScreen from './components/WebScreen';
 import { useState, useEffect } from 'react';
 import RNFS from 'react-native-fs';
+import Toast from 'react-native-toast-message';
 
 
 export type DrawerParamList = {
@@ -255,6 +256,7 @@ const App = () => {
           })}
         />
       </Drawer.Navigator>
+      <Toast/>
     </NavigationContainer>
   );
 };

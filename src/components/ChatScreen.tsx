@@ -1,19 +1,21 @@
-import { View, TextInput, Dimensions, Image, TouchableOpacity, StatusBar, KeyboardAvoidingView, FlatList, Text, ScrollView } from 'react-native';
+import { View, TextInput, Dimensions, Image, TouchableOpacity, StatusBar, KeyboardAvoidingView, FlatList, Text, ScrollView, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import Toast from 'react-native-toast-message'
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { DrawerParamList } from '../App';
 
-type DrawerProps = DrawerScreenProps<DrawerParamList,'ChatScreen'>;
+type DrawerProps = DrawerScreenProps<DrawerParamList, 'ChatScreen'>;
 
-const ChatScreen = ({route}:DrawerProps) => {
+const ChatScreen = ({ route }: DrawerProps) => {
     const [searchinp, setsearchinp] = useState('');
     const [chatData, setchatData] = useState<{ type: string; content: string }[]>([]);
     const [edit, setedit] = useState(true);
     const list = useRef<any>(null);
-    const [Agent, setAgent] = useState<string|undefined>('');
-    const [prompt, setprompt] = useState<string|undefined>('');
+    const [Agent, setAgent] = useState<string | undefined>('');
+    const [prompt, setprompt] = useState<string | undefined>('');
+    const [loader, setloader] = useState(false);
 
     useEffect(() => {
         setsearchinp('');
@@ -24,14 +26,14 @@ const ChatScreen = ({route}:DrawerProps) => {
         setprompt(route.params?.prompt);
         setchatData([]);
         console.log(route.params?.Agent);
-        
+
     }, [route.params]);
 
     useEffect(() => {
         if (chatData.length > 0) {
-          setTimeout(() => {
-            list.current?.scrollToOffset({ offset: 99999, animated: true });
-          }, 100);
+            setTimeout(() => {
+                list.current?.scrollToOffset({ offset: 99999, animated: true });
+            }, 100);
         }
     }, [chatData]);
 
@@ -44,24 +46,28 @@ const ChatScreen = ({route}:DrawerProps) => {
 
     const requestorca = async (inp: string) => {
         try {
+            setloader(true);
             const response = await fetch("https://1824-152-58-20-39.ngrok-free.app/search", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ "data": inp, "collection_name": Agent, "prompt": prompt===undefined?"":prompt })
+                body: JSON.stringify({ "data": inp, "collection_name": Agent, "prompt": prompt === undefined ? "" : prompt })
             });
             const res = await response.json();
             setchatData(prevChatData => [...prevChatData, { "type": "system", "content": res["response"] }]);
-        } catch (e){
+            setloader(false);
+        } catch (e) {
             // console.log(e);
+            showToast("error", "Something went wrong !");
             setedit(true);
+            setloader(false);
         }
     };
 
     const handleUserInput = async (inp: string) => {
-        if(inp!=""){
+        if (inp != "") {
             setedit(false);
             setchatData(prevChatData => [...prevChatData, { "type": "user", "content": inp }]);
             await requestorca(inp);
@@ -69,10 +75,19 @@ const ChatScreen = ({route}:DrawerProps) => {
         }
     };
 
+    const showToast = (type: string, message: string) => {
+        Toast.show({
+            type: type,
+            text1: message,
+            text1Style: { color: 'rgb(25,42,86)', fontSize: 18 },
+            visibilityTime: 4000,
+        });
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.messageContainer}>
-                {chatData.length!=0?<FlatList
+                {chatData.length != 0 ? <FlatList
                     style={styles.chatContainer}
                     data={chatData}
                     ref={list}
@@ -92,14 +107,14 @@ const ChatScreen = ({route}:DrawerProps) => {
                             )}
                         </View>
                     )}
-                />:<View style={{flex:1,paddingHorizontal:15, alignItems:'center',flexDirection:'row',gap:5}}><Text style={{fontSize:Dimensions.get('window').width/12,marginLeft:Dimensions.get('window').width/10}}>Welcome,</Text><ScrollView horizontal={true}><Text style={{color:'rgb(38, 121, 255)',fontSize:Dimensions.get('window').width/12}}>Gaurav</Text></ScrollView></View>}
+                /> : <View style={{ flex: 1, paddingHorizontal: 15, alignItems: 'center', flexDirection: 'row', gap: 5 }}><Text style={{ fontSize: Dimensions.get('window').width / 12, marginLeft: Dimensions.get('window').width / 10 }}>Welcome,</Text><ScrollView horizontal={true}><Text style={{ color: 'rgb(38, 121, 255)', fontSize: Dimensions.get('window').width / 12 }}>Gaurav</Text></ScrollView></View>}
             </View>
             <KeyboardAvoidingView behavior='height' enabled={true} keyboardVerticalOffset={0} style={styles.keyboardAvoidingContainer}>
                 <View style={styles.inputContainer}>
                     <TextInput
                         editable={edit}
                         style={styles.inputField}
-                        placeholder={`Message ${Agent}`} 
+                        placeholder={`Message ${Agent}`}
                         placeholderTextColor="rgba(39, 39, 39, 0.76)"
                         cursorColor="rgba(39, 39, 39, 0.76)"
                         enterKeyHint='search'
@@ -109,13 +124,18 @@ const ChatScreen = ({route}:DrawerProps) => {
                         onChangeText={setsearchinp}
                         onSubmitEditing={() => handleUserInput(searchinp)}
                     />
-                    <TouchableOpacity style={styles.sendbtn} onPress={() => handleUserInput(searchinp)}>
+                    {!loader ? <TouchableOpacity style={styles.sendbtn} onPress={() => handleUserInput(searchinp)}>
                         {searchinp.length !== 0 ? (
                             <Image style={styles.sendIcon} source={require('../assets/send.png')} />
                         ) : (
                             <Image style={styles.sendIcon} source={require('../assets/mic.png')} />
                         )}
-                    </TouchableOpacity>
+                    </TouchableOpacity> : <ActivityIndicator
+                        animating={true}
+                        color={'#0073FF'}
+                        size={'large'}
+                    >
+                    </ActivityIndicator>}
                 </View>
             </KeyboardAvoidingView>
         </View>
@@ -128,7 +148,7 @@ const styles = StyleSheet.create({
     },
     messageContainer: {
         // flex: 1,
-        paddingLeft:10,
+        paddingLeft: 10,
         height: Dimensions.get('window').height - Dimensions.get('window').height / 6,
     },
     inputContainer: {
