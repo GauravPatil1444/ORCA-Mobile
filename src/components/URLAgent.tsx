@@ -52,8 +52,10 @@ const URLAgent = ({ route }: DrawerProps) => {
           await Agents.splice(0, 0, Agent_data);
           console.log(Agents);
           await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
-          navigation.dispatch(DrawerActions.jumpTo('WebScreen', { "link": link, "classes_to_remove": classes }))
+          // navigation.dispatch(DrawerActions.jumpTo('WebScreen', { "link": link, "classes_to_remove": classes }))
+          showToast ("success", "Agent Deployed!");
           setloader(false);
+          RNRestart.restart();
         }
       }
       catch (e) {
@@ -78,7 +80,7 @@ const URLAgent = ({ route }: DrawerProps) => {
     if (classes === "URL") {
       try {
         setdeleteloader(true);
-        const response = await fetch('https://1824-152-58-20-39.ngrok-free.app/delete', {
+        const response = await fetch('https://orca-574216179276.asia-south1.run.app/delete', {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
@@ -108,8 +110,9 @@ const URLAgent = ({ route }: DrawerProps) => {
       Agents.splice(index, 1);
       await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
       // navigation.dispatch(DrawerActions.jumpTo('AgentSelector'));
-      RNRestart.restart();
+      showToast ("success", "Agent Deleted!");
       setdeleteloader(false);
+      RNRestart.restart();
     }
     catch {
       // console.log("Something went wrong!");
@@ -123,7 +126,7 @@ const URLAgent = ({ route }: DrawerProps) => {
     if (link !== "" && Agent !== "") {
       try {
         setloader(true);
-        const response = await fetch("https://1824-152-58-20-39.ngrok-free.app/webupload", {
+        const response = await fetch("https://orca-574216179276.asia-south1.run.app/webupload", {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
@@ -152,8 +155,9 @@ const URLAgent = ({ route }: DrawerProps) => {
           }
           Agents.splice(0, 0, Agent_data);
           await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
-          navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": Agent, "prompt": 'URL' }))
+          // navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": Agent, "prompt": 'URL' }))
           setloader(false);
+          RNRestart.restart();
         }
       }
       catch (e) {
@@ -208,7 +212,7 @@ const URLAgent = ({ route }: DrawerProps) => {
         </View>
       </View>
 
-      {deleteoption && <TouchableOpacity style={[styles.btn, { width: '40%', height: 'auto', backgroundColor: 'rgba(255, 69, 69, 0.26)' }]} onPress={() => { DeleteAgent() }}>
+      {deleteoption && <TouchableOpacity disabled={deleteloader} style={[styles.btn, { width: '40%', height: 'auto', backgroundColor: 'rgba(255, 69, 69, 0.26)' }]} onPress={() => { DeleteAgent() }}>
         {!deleteloader ? <><Text style={{ color: 'rgb(255, 0, 0)', fontSize: 15, fontWeight: 'bold' }}>Delete Agent</Text>
           <Image
             style={{ width: 20, height: 20, tintColor: 'rgb(255, 0, 0)' }}
@@ -233,7 +237,7 @@ const URLAgent = ({ route }: DrawerProps) => {
         value={link}
         onChangeText={setlink}
       />
-      {selected === "webpage" && <TextInput
+      {<TextInput
         style={[styles.inputField]}
         placeholder="Set Agent name"
         placeholderTextColor="rgba(39, 39, 39, 0.76)"
@@ -291,7 +295,7 @@ const URLAgent = ({ route }: DrawerProps) => {
 
       </View>}
 
-      <TouchableOpacity style={[styles.btn, { backgroundColor: 'rgba(69, 255, 85, 0.2)', width: '30%', height: 'auto' }]} onPress={() => handleConfirm()}>
+      <TouchableOpacity disabled={loader} style={[styles.btn, { backgroundColor: 'rgba(69, 255, 85, 0.2)', width: '30%', height: 'auto' }]} onPress={() => handleConfirm()}>
         {!loader ? <><Text style={{ color: 'rgb(1, 107, 10)', fontSize: 15, fontWeight: 'bold' }}>Confirm</Text>
           <Image
             style={{ width: 18, height: 18, tintColor: 'rgb(1, 107, 10)' }}

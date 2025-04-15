@@ -83,9 +83,9 @@ const DocumentAgent = ({ route }: DrawerProps) => {
 
   const process = async () => {
     const dir = RNFS.DocumentDirectoryPath + "/" + pdfpath;
-    // console.log(docs);
-    if (Agent !== "" && prompt !== "") {
-      if (regex == true && expression != "") {
+    console.log(Agent?.length,prompt?.length);
+    if (Agent?.length!=0 && prompt?.length!=0) {
+      if (regex != true && expression.length==0) {
         setloader(true);
         try {
           const formData = new FormData();
@@ -102,7 +102,7 @@ const DocumentAgent = ({ route }: DrawerProps) => {
           formData.append('overlap', overlap);
           formData.append('regex', expression);
 
-          const response = await fetch('https://972a-2409-4081-97-c4cd-9cd3-e5d8-1868-b26b.ngrok-free.app/upload', {
+          const response = await fetch('https://orca-574216179276.asia-south1.run.app/upload', {
             method: 'POST',
             body: formData,
             headers: {
@@ -132,7 +132,9 @@ const DocumentAgent = ({ route }: DrawerProps) => {
             await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
             navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": Agent, "prompt": prompt }))
             RNFS.unlink(dir);
+            showToast ("success", "Agent Deployed!");
             setloader(false);
+            RNRestart.restart();
           }
         }
         catch (e) {
@@ -148,6 +150,8 @@ const DocumentAgent = ({ route }: DrawerProps) => {
         }
         else{
           showToast ("info", "Fill all the fields");
+          console.log(1);
+          
         }
         setloader(false);
       }
@@ -166,7 +170,7 @@ const DocumentAgent = ({ route }: DrawerProps) => {
 
   const DeleteAgent = async () => {
     try {
-      const response = await fetch('https://972a-2409-4081-97-c4cd-9cd3-e5d8-1868-b26b.ngrok-free.app/delete', {
+      const response = await fetch('https://orca-574216179276.asia-south1.run.app/delete', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -189,6 +193,7 @@ const DocumentAgent = ({ route }: DrawerProps) => {
       Agents.splice(index, 1);
       await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
       // navigation.dispatch(DrawerActions.jumpTo('AgentSelector'))
+      showToast ("success", "Agent Deleted!");
       RNRestart.restart();
     }
     catch (e) {
@@ -241,7 +246,7 @@ const DocumentAgent = ({ route }: DrawerProps) => {
                 source={require("../assets/file.png")}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.btn, { width: '40%', height: '80%', backgroundColor: 'rgba(255, 69, 69, 0.26)' }]} onPress={() => { DeleteAgent() }}>
+            <TouchableOpacity disabled={deleteloader} style={[styles.btn, { width: '40%', height: '80%', backgroundColor: 'rgba(255, 69, 69, 0.26)' }]} onPress={() => { DeleteAgent() }}>
               {!deleteloader ? <><Text style={{ color: 'rgb(255, 0, 0)', fontSize: 15, fontWeight: 'bold' }}>Delete Agent</Text>
                 <Image
                   style={{ width: 20, height: 20, tintColor: 'rgb(255, 0, 0)' }}
@@ -249,7 +254,7 @@ const DocumentAgent = ({ route }: DrawerProps) => {
                 /></> :
                 <ActivityIndicator
                   animating={true}
-                  color={'#0073FF'}
+                  color={'rgb(255, 0, 0)'}
                   size={'small'}
                 >
                 </ActivityIndicator>}
@@ -312,7 +317,7 @@ const DocumentAgent = ({ route }: DrawerProps) => {
           value={prompt}
           onChangeText={setprompt}
         />
-        {regex == false && <>
+        {regex == false && filename?.split('.')[1] != "csv" && filename?.split('.')[1] != "json" && <>
           <View style={{ width: '100%', flexDirection: 'column', alignItems: 'center' }}>
 
             <Text style={{ marginBottom: -10, marginTop: 10 }}>Chunk size</Text>

@@ -47,7 +47,7 @@ const ChatScreen = ({ route }: DrawerProps) => {
     const requestorca = async (inp: string) => {
         try {
             setloader(true);
-            const response = await fetch("https://1824-152-58-20-39.ngrok-free.app/search", {
+            const response = await fetch("https://orca-574216179276.asia-south1.run.app/search", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

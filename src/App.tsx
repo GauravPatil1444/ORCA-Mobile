@@ -18,7 +18,7 @@ import Toast from 'react-native-toast-message';
 
 export type DrawerParamList = {
   ChatScreen: { "Agent": string, "prompt": string } | undefined;
-  WebScreen: { "link": string, "classes_to_remove": string };
+  WebScreen: { "Agent":string,"link": string, "classes_to_remove": string };
   SplashScreen: undefined;
   DocumentAgent: { "Agent": string, "prompt": string } | undefined;
   URLAgent: { "link": string | undefined, "Agent": string | undefined, "classes_to_remove": string } | undefined;
@@ -129,12 +129,12 @@ const App = () => {
                   maxToRenderPerBatch={10}
                   keyExtractor={(item, index) => index.toString()}
                   renderItem={({ item }: any) => (
-                    <TouchableOpacity style={styles.DrawerTabs} onPress={() => { item['Agent_type'] !== "Web_URLAgent" ? props.navigation.dispatch(DrawerActions.jumpTo('WebScreen', { "link": item["link"], "classes_to_remove": item["classes_to_remove"] })) : props.navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": item["Agent"], "prompt": "" })) }}>
+                    <TouchableOpacity style={styles.DrawerTabs} onPress={() => { item['Agent_type'] !== "Web_URLAgent" ? props.navigation.dispatch(DrawerActions.jumpTo('WebScreen', { "Agent": item["Agent"], "link": item["link"], "classes_to_remove": item["classes_to_remove"] })) : props.navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": item["Agent"], "prompt": "" })) }}>
                       <Image
                         style={{ width: 20, height: 20 }}
                         source={require("./assets/bot.png")}
                       />
-                      <Text style={styles.DrawerTabText}>{item.link}</Text>
+                      <Text style={styles.DrawerTabText}>{item.Agent}</Text>
                     </TouchableOpacity>
                   )}
                 />}
@@ -230,7 +230,7 @@ const App = () => {
           name="WebScreen"
           component={WebScreen}
           options={({ navigation, route }) => ({
-            title: route.params?.link,
+            title: route.params?.Agent,
             headerStyle: {
               backgroundColor: 'white'
             },
@@ -246,7 +246,7 @@ const App = () => {
               </TouchableOpacity>
             ),
             headerRight: () => (
-              <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.jumpTo('URLAgent', { "link": route.params?.link, "classes_to_remove": route.params?.classes_to_remove }))} style={{ marginLeft: 15 }}>
+              <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.jumpTo('URLAgent', { "Agent": route.params?.Agent, "link": route.params?.link, "classes_to_remove": route.params?.classes_to_remove }))} style={{ marginLeft: 15 }}>
                 <Image
                   style={{ width: 25, height: 25, marginRight: 15 }}
                   source={require("./assets/setting.png")}

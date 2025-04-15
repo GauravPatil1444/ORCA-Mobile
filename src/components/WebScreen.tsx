@@ -16,17 +16,18 @@ const WebScreen = ({route}:DrawerProps) => {
     const [Agent, setAgent] = useState<any>('');
     const [classes_to_remove, setprompt] = useState<string|undefined>('');
     const [invoke, setinvoke] = useState(false);
+    const [link, setlink] = useState('')
 
     useEffect(() => {
         setsearchinp('');
     }, [chatData]);
 
     useEffect(() => {
-        setAgent(route.params?.link);
+        setAgent(route.params?.Agent);
+        setlink(route.params?.link);
         setprompt(route.params?.classes_to_remove);
         setchatData([]);
-        console.log(route.params?.link);
-        // console.log();
+        // console.log("link",route.params?.link);
         setchatData([]);
         
     }, [route.params]);
@@ -46,14 +47,13 @@ const WebScreen = ({route}:DrawerProps) => {
         }, [])
     );
 
-    const requestorca = async (inp: string) => {
+    const requestorca = async () => {
         try {
             // setqueryParams({
             //     link: inp,
             //     query: Agent,
             //     classes_to_remove: classes_to_remove ?? ""
             // });
-            setinvoke(false);
             setTimeout(() => {
                 setinvoke(true);
                 setchatData(1);
@@ -67,10 +67,10 @@ const WebScreen = ({route}:DrawerProps) => {
     };
 
     const handleUserInput = async (inp: string) => {
-        if(inp!=""){
+        if(inp.length!=0){
             setedit(false);
             // setchatData(prevChatData => [...prevChatData, { "type": "user", "content": inp }]);
-            await requestorca(inp);
+            await requestorca();
             setinvoke(false);
             setedit(true);
         }
@@ -85,7 +85,7 @@ const WebScreen = ({route}:DrawerProps) => {
         <View style={styles.container}>
             <View style={styles.messageContainer}>
                 {chatData.length!=0&&invoke?
-                    <WebView source={{ uri: `https://3b9e-2409-4081-97-c4cd-4961-2148-f5d2-5504.ngrok-free.app/owst?link=${Agent}&query=${searchinp}&classes_to_remove=${classes_to_remove} ` }} style={{ flex: 1 }} />
+                    <WebView source={{ uri: `https://orca-574216179276.asia-south1.run.app/owst?link=${link}&query=${searchinp}&classes_to_remove=${classes_to_remove} ` }} style={{ flex: 1 }} />
                 :<View style={{flex:1,paddingHorizontal:15, alignItems:'center',flexDirection:'row',gap:5}}><Text style={{fontSize:Dimensions.get('window').width/12,marginLeft:Dimensions.get('window').width/10}}>Welcome,</Text><ScrollView horizontal={true}><Text style={{color:'rgb(38, 121, 255)',fontSize:Dimensions.get('window').width/12}}>Gaurav</Text></ScrollView></View>}
             </View>
             <KeyboardAvoidingView behavior='height' enabled={true} keyboardVerticalOffset={0} style={styles.keyboardAvoidingContainer}>
