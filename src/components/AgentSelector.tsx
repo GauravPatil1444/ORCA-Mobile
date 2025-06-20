@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { DrawerActions } from '@react-navigation/native'
 import Toast from 'react-native-toast-message'
+import RNFS from 'react-native-fs';
 
 const AgentSelector = () => {
 
@@ -30,6 +31,19 @@ const AgentSelector = () => {
       visibilityTime: 4000,
     });
   }
+
+  // useEffect(() => {
+  //   try{
+  //     const path = RNFS.DocumentDirectoryPath + '/user_preferences.txt';
+  //     const data:any = RNFS.readFile(path, 'utf8');
+  //     console.log(data.json())
+  //   }
+  //   catch{
+  //     navigation.dispatch(DrawerActions.jumpTo('Authentication'));     
+  //   }
+  
+  // }, [])
+  
 
   return (
     <View style={{ flex: 1, alignItems: 'center', gap: 15 }}>

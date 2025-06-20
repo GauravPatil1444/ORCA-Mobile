@@ -11,10 +11,12 @@ import AgentSelector from './components/AgentSelector';
 import DocumentAgent from './components/DocumentAgent';
 import URLAgent from './components/URLAgent';
 import WebScreen from './components/WebScreen';
+import Authentication from './components/Authentication'
 import { useState, useEffect } from 'react';
 import RNFS from 'react-native-fs';
 import Toast from 'react-native-toast-message';
-
+import RNRestart from 'react-native-restart';
+import { useNavigation } from '@react-navigation/native';
 
 export type DrawerParamList = {
   ChatScreen: { "Agent": string, "prompt": string } | undefined;
@@ -23,6 +25,7 @@ export type DrawerParamList = {
   DocumentAgent: { "Agent": string, "prompt": string } | undefined;
   URLAgent: { "link": string | undefined, "Agent": string | undefined, "classes_to_remove": string } | undefined;
   AgentSelector: undefined;
+  Authentication: undefined;
 }
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
@@ -32,16 +35,26 @@ const App = () => {
   const [Agents, setAgents] = useState<string[]>([]);
   const [URLAgents, setURLAgents] = useState<string[]>([]);
   const [dropdown, setdropdown] = useState('');
+  const [userData, setuserData] = useState<any[]>(["xyz","abc"]);
 
   const startup = async () => {
-    const path = RNFS.DocumentDirectoryPath + '/Agents.txt';
-    const data = await RNFS.readFile(path, 'utf8');
-    const Agents = await JSON.parse(data);
-    setAgents(Agents);
-    const path1 = RNFS.DocumentDirectoryPath + '/URLAgents.txt';
-    const data1 = await RNFS.readFile(path1, 'utf8');
-    const Agents1 = await JSON.parse(data1);
-    setURLAgents(Agents1)
+    try{
+      const path = RNFS.DocumentDirectoryPath + '/user_preferences.txt';
+      const data = await RNFS.readFile(path, 'utf8');
+      const Agents = await JSON.parse(data);
+      setuserData([Agents[0][0],Agents[0][1]]);
+      setAgents(Agents[1]);
+      setURLAgents(Agents[2])
+    }
+    catch{
+      // navigation.dispatch(DrawerActions.jumpTo('Authentication'));
+    }
+  }
+
+  const Logout = ()=>{
+    const path = RNFS.DocumentDirectoryPath + '/user_preferences.txt';
+    RNFS.unlink(path);
+    RNRestart.restart();
   }
 
   useEffect(() => {
@@ -64,14 +77,14 @@ const App = () => {
               <View style={styles.profile}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <TouchableOpacity style={styles.logo}>
-                    <Text style={{ color: 'white', fontSize: 25 }}>G</Text>
+                    <Text style={{ color: 'white', fontSize: 25 }}>{userData[1][0]}</Text>
                   </TouchableOpacity>
                   <ScrollView horizontal={true}>
-                    <Text style={{ color: '#192A56', fontSize: Dimensions.get('window').width / 15 }}>Gaurav</Text>
+                    <Text style={{ color: '#192A56', fontSize: Dimensions.get('window').width / 15 }}>{userData[1]}</Text>
                   </ScrollView>
                 </View>
-                <Text style={{ color: '#192A56', fontSize: 15, paddingLeft: 5 }}>patilgauravajit@gmail.com</Text>
-                <TouchableOpacity style={{ backgroundColor: 'rgba(135, 207, 235, 0.26)', width: '30%', padding: 10, alignItems: 'center', borderRadius: 8 }}>
+                <Text style={{ color: '#192A56', fontSize: 15, paddingLeft: 5 }}>{userData[0]}</Text>
+                <TouchableOpacity style={{ backgroundColor: 'rgba(135, 207, 235, 0.26)', width: '30%', padding: 10, alignItems: 'center', borderRadius: 8 }} onPress={()=>{Logout()}}>
                   <Text style={{ color: '#192A56', fontSize: 15, fontWeight: 'bold' }}>Logout</Text>
                 </TouchableOpacity>
               </View>
@@ -170,6 +183,16 @@ const App = () => {
         <Drawer.Screen
           name="SplashScreen"
           component={SplashScreen}
+          options={{
+            headerShown: false,
+            drawerItemStyle: {
+              display: 'none',
+            }
+          }}
+        />
+        <Drawer.Screen
+          name="Authentication"
+          component={Authentication}
           options={{
             headerShown: false,
             drawerItemStyle: {

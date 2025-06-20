@@ -10,11 +10,14 @@ import Toast from 'react-native-toast-message'
 import RNRestart from 'react-native-restart';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { DrawerParamList } from '../App';
+import { firebase_auth } from '../../firebaseConfig'
+import { db } from '../../firebaseConfig';
+import { addDoc, collection } from 'firebase/firestore'
 
 type DrawerProps = DrawerScreenProps<DrawerParamList, 'DocumentAgent'>;
 
 const DocumentAgent = ({ route }: DrawerProps) => {
-
+  
   const [filename, setfilename] = useState<string | null>('');
   const [fileexists, setfileexists] = useState(false);
   const [pdfpath, setpdfpath] = useState<string>('');
@@ -27,6 +30,8 @@ const DocumentAgent = ({ route }: DrawerProps) => {
   const [deleteoption, setdeleteoption] = useState(false);
   const [loader, setloader] = useState(false);
   const [deleteloader, setdeleteloader] = useState(false);
+  
+  const uid = firebase_auth.currentUser?.uid;
 
   const navigation = useNavigation();
 
@@ -83,78 +88,81 @@ const DocumentAgent = ({ route }: DrawerProps) => {
 
   const process = async () => {
     const dir = RNFS.DocumentDirectoryPath + "/" + pdfpath;
-    console.log(Agent?.length,prompt?.length);
-    if (Agent?.length!=0 && prompt?.length!=0) {
-      if (regex != true && expression.length==0) {
-        setloader(true);
+    console.log(Agent?.length, prompt?.length);
+    if (Agent?.length != 0 && prompt?.length != 0) {
+      // if (regex) {
+      setloader(true);
+      try {
+        const formData = new FormData();
+
+        formData.append('file', {
+          uri: `file://${dir}`, // prepend file:// on Android
+          name: filename,
+          type: getMimeType(filename), // detect content-type
+        });
+
+        formData.append('collection_name', Agent);
+        formData.append('pdfoption', regex ? "adv" : "");
+        formData.append('range', range);
+        formData.append('overlap', overlap);
+        formData.append('regex', expression);
+
+        const response = await fetch('https://orca-574216179276.asia-south1.run.app/upload', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        const result = await response.json();
+        console.log(result);
+        const path = RNFS.DocumentDirectoryPath + '/user_preferences.txt';
+        let Agents = [];
         try {
-          const formData = new FormData();
-
-          formData.append('file', {
-            uri: `file://${dir}`, // prepend file:// on Android
-            name: filename,
-            type: getMimeType(filename), // detect content-type
-          });
-
-          formData.append('collection_name', Agent);
-          formData.append('pdfoption', regex ? "adv" : "");
-          formData.append('range', range);
-          formData.append('overlap', overlap);
-          formData.append('regex', expression);
-
-          const response = await fetch('https://orca-574216179276.asia-south1.run.app/upload', {
-            method: 'POST',
-            body: formData,
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-
-          const result = await response.json();
-          console.log(result);
-          const path = RNFS.DocumentDirectoryPath + '/Agents.txt';
-          let Agents = [];
-          try {
-            let res = await RNFS.readFile(path, 'utf8')
-            Agents = JSON.parse(res);
-            console.log(typeof (Agents), Agents);
-          }
-          catch {
-            Agents = [];
-          }
-          finally {
-            const Agent_data = {
-              "Agent": Agent,
-              "Agent_type": "DocumentAgent",
-              "prompt": prompt
-            }
-            Agents.splice(0, 0, Agent_data);
-            await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
-            navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": Agent, "prompt": prompt }))
-            RNFS.unlink(dir);
-            showToast ("success", "Agent Deployed!");
-            setloader(false);
-            RNRestart.restart();
-          }
+          let res = await RNFS.readFile(path, 'utf8');
+          Agents = JSON.parse(res);
+          console.log(typeof (Agents), Agents);
         }
-        catch (e) {
-          setfileexists(false);
-          console.log(e);
+        catch {
+          Agents = [];
+          navigation.dispatch(DrawerActions.jumpTo('Authentication'));
+        }
+        finally {
+          const Agent_data =  {
+            "Agent": Agent,
+            "Agent_type": "DocumentAgent",
+            "prompt": prompt
+          }
+          Agents[1].splice(0, 0, Agent_data);
+          await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
+          const docRef = await addDoc(collection(db, "users", `${uid}/UserPreferences`), Agents);
+          // navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": Agent, "prompt": prompt }))
           RNFS.unlink(dir);
+          showToast("success", "Agent Deployed!");
           setloader(false);
+          RNRestart.restart();
         }
       }
-      else {
-        if(regex){
-          showToast ("info", "Fill Expression field");
-        }
-        else{
-          showToast ("info", "Fill all the fields");
-          console.log(1);
-          
-        }
+      catch (e) {
+        setfileexists(false);
+        console.log(e);
+        RNFS.unlink(dir);
         setloader(false);
       }
+      // }
+      // else {
+      //   if(regex){
+      //     showToast ("info", "Fill Expression field");
+      //   }
+      //   else{
+      //     showToast ("info", "Fill all the fields");
+      //     console.log(1);
+
+      //   }
+      //   setloader(false);
+      // }
+      setloader(false);
     }
     else {
       showToast("info", "Fill all the fields");
@@ -179,21 +187,22 @@ const DocumentAgent = ({ route }: DrawerProps) => {
         body: JSON.stringify({ "collection_name": Agent })
       });
       console.log(response);
-      const path = RNFS.DocumentDirectoryPath + '/Agents.txt';
+      const path = RNFS.DocumentDirectoryPath + '/user_preferences.txt';
       let res = await RNFS.readFile(path, 'utf8')
       let Agents = await JSON.parse(res);
       let index: number = -1;
       for (let i = 0; i < Agents.length; i++) {
-        if (Agents[i]["Agent"] === Agent) {
+        if (Agents[1][i]["Agent"] === Agent) {
           index = i;
-          console.log(Agents[i]["Agent"], "deleted");
+          console.log(Agents[1][i]["Agent"], "deleted");
           break;
         }
       }
-      Agents.splice(index, 1);
+      Agents[1].splice(index, 1);
       await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
+      const docRef = await addDoc(collection(db, "users", `${uid}/UserPreferences`), Agents);
       // navigation.dispatch(DrawerActions.jumpTo('AgentSelector'))
-      showToast ("success", "Agent Deleted!");
+      showToast("success", "Agent Deleted!");
       RNRestart.restart();
     }
     catch (e) {

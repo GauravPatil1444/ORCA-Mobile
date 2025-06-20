@@ -23,6 +23,7 @@ const SplashScreen = () => {
 
 
     const startup = () => {
+        let data:any;
         const response = fetch("https://orca-574216179276.asia-south1.run.app/", {
             method: 'GET',
         });
@@ -33,14 +34,15 @@ const SplashScreen = () => {
         }, 3000);
         setTimeout(async () => {
             try {
-                const path = RNFS.DocumentDirectoryPath + '/Agents.txt';
-                const data = await RNFS.readFile(path, 'utf8');
-                const Agents = await JSON.parse(data);
-                const path1 = RNFS.DocumentDirectoryPath + '/URLAgents.txt';
-                const data1 = await RNFS.readFile(path1, 'utf8');
-                const URLAgents = await JSON.parse(data1);
-                // console.log(URLAgents);
                 
+                const path = RNFS.DocumentDirectoryPath + '/user_preferences.txt';
+                data = await RNFS.readFile(path, 'utf8');
+                const parsedData = await JSON.parse(data);
+                const Agents = parsedData["DocAgents"];
+                const URLAgents = parsedData["URLAgents"];
+              
+                // console.log(parsedData);
+
                 if (Agents.length == 0) {
                     if (URLAgents.length != 0) {
                         setvisited(true);
@@ -61,9 +63,9 @@ const SplashScreen = () => {
                     navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": Agents[0]["Agent"], "prompt": Agents[0]["prompt"] }));
                 }
             }
-            catch{
+            catch {
                 setvisited(true);
-                navigation.dispatch(DrawerActions.jumpTo('AgentSelector'));
+                navigation.dispatch(DrawerActions.jumpTo('Authentication'));
             }
         }, 5000)
     }

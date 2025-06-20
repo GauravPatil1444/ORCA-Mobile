@@ -10,10 +10,13 @@
     "test": "jest"
   },
   "dependencies": {
+    "@firebase/auth": "^1.10.7",
+    "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-native-community/slider": "^4.5.6",
     "@react-native-documents/picker": "^10.1.1",
     "@react-navigation/drawer": "^7.3.2",
     "@react-navigation/native": "^7.0.19",
+    "firebase": "^11.9.1",
     "lottie-react-native": "^7.2.2",
     "react": "19.0.0",
     "react-native": "0.78.1",
