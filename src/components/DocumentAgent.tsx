@@ -12,12 +12,12 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import { DrawerParamList } from '../App';
 import { firebase_auth } from '../../firebaseConfig'
 import { db } from '../../firebaseConfig';
-import { addDoc, collection } from 'firebase/firestore'
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore'
 
 type DrawerProps = DrawerScreenProps<DrawerParamList, 'DocumentAgent'>;
 
 const DocumentAgent = ({ route }: DrawerProps) => {
-  
+
   const [filename, setfilename] = useState<string | null>('');
   const [fileexists, setfileexists] = useState(false);
   const [pdfpath, setpdfpath] = useState<string>('');
@@ -30,7 +30,7 @@ const DocumentAgent = ({ route }: DrawerProps) => {
   const [deleteoption, setdeleteoption] = useState(false);
   const [loader, setloader] = useState(false);
   const [deleteloader, setdeleteloader] = useState(false);
-  
+
   const uid = firebase_auth.currentUser?.uid;
 
   const navigation = useNavigation();
@@ -129,14 +129,21 @@ const DocumentAgent = ({ route }: DrawerProps) => {
           navigation.dispatch(DrawerActions.jumpTo('Authentication'));
         }
         finally {
-          const Agent_data =  {
+          const Agent_data = {
             "Agent": Agent,
             "Agent_type": "DocumentAgent",
             "prompt": prompt
           }
-          Agents[1].splice(0, 0, Agent_data);
+          await Agents["DocAgents"].splice(0, 0, Agent_data);
           await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
-          const docRef = await addDoc(collection(db, "users", `${uid}/UserPreferences`), Agents);
+          console.log(Agents);
+
+          // const docRef = await addDoc(collection(db, "users", `${uid}/UserPreferences`), Agents);
+          const docRef = collection(db, "users", `${uid}/UserPreferences`);
+          const docSnap = await getDocs(docRef);
+          const docref = doc(db, "users", `${uid}`, "UserPreferences", docSnap.docs[0].id);
+          await updateDoc(docref, Agents);
+
           // navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": Agent, "prompt": prompt }))
           RNFS.unlink(dir);
           showToast("success", "Agent Deployed!");
@@ -144,9 +151,9 @@ const DocumentAgent = ({ route }: DrawerProps) => {
           RNRestart.restart();
         }
       }
-      catch (e) {
+      catch {
         setfileexists(false);
-        console.log(e);
+        console.log(404);
         RNFS.unlink(dir);
         setloader(false);
       }
@@ -177,6 +184,8 @@ const DocumentAgent = ({ route }: DrawerProps) => {
   }
 
   const DeleteAgent = async () => {
+    const uid = firebase_auth.currentUser?.uid;
+    setdeleteloader(true);
     try {
       const response = await fetch('https://orca-574216179276.asia-south1.run.app/delete', {
         method: 'POST',
@@ -191,23 +200,30 @@ const DocumentAgent = ({ route }: DrawerProps) => {
       let res = await RNFS.readFile(path, 'utf8')
       let Agents = await JSON.parse(res);
       let index: number = -1;
-      for (let i = 0; i < Agents.length; i++) {
-        if (Agents[1][i]["Agent"] === Agent) {
+      for (let i = 0; i < Agents["DocAgents"].length; i++) {
+        if (Agents["DocAgents"][i]["Agent"] === Agent) {
           index = i;
-          console.log(Agents[1][i]["Agent"], "deleted");
+          console.log(Agents["DocAgents"][i]["Agent"], "deleted");
           break;
         }
       }
-      Agents[1].splice(index, 1);
+      await Agents["DocAgents"].splice(index, 1);
+      // console.log(Agents);
+
       await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
-      const docRef = await addDoc(collection(db, "users", `${uid}/UserPreferences`), Agents);
-      // navigation.dispatch(DrawerActions.jumpTo('AgentSelector'))
-      showToast("success", "Agent Deleted!");
+      const docRef = collection(db, "users", `${uid}/UserPreferences`);
+      const docSnap = await getDocs(docRef);
+      const docref = doc(db, "users", `${uid}`, "UserPreferences", docSnap.docs[0].id);
+      await updateDoc(docref, Agents);
+  
       RNRestart.restart();
     }
     catch (e) {
       console.log("Something went wrong!", e);
       showToast("error", "Something went wrong !");
+    }
+    finally {
+      setdeleteloader(false);
     }
   }
 

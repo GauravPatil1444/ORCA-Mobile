@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message'
 import RNRestart from 'react-native-restart';
 import { firebase_auth } from '../../firebaseConfig'
 import { db } from '../../firebaseConfig';
-import { addDoc, collection } from 'firebase/firestore'
+import { addDoc, collection, getDocs, updateDoc, doc } from 'firebase/firestore'
 
 type DrawerProps = DrawerScreenProps<DrawerParamList, 'URLAgent'>;
 
@@ -53,12 +53,18 @@ const URLAgent = ({ route }: DrawerProps) => {
             "Agent_type": "URLAgent",
             "classes_to_remove": classes
           }
-          await Agents[2].splice(0, 0, Agent_data);
+          await Agents["URLAgents"].splice(0, 0, Agent_data);
           console.log(Agents);
           await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
-          const docRef = await addDoc(collection(db, "users", `${uid}/UserPreferences`), Agents);
+          // const docRef = await addDoc(collection(db, "users", `${uid}/UserPreferences`), Agents);
+          
+          const docRef = collection(db, "users", `${uid}/UserPreferences`);
+          const docSnap = await getDocs(docRef);
+          const docref = doc(db, "users", `${uid}`, "UserPreferences", docSnap.docs[0].id);
+          await updateDoc(docref, JSON.parse(Agents));
+          
           // navigation.dispatch(DrawerActions.jumpTo('WebScreen', { "link": link, "classes_to_remove": classes }))
-          showToast ("success", "Agent Deployed!");
+          showToast("success", "Agent Deployed!");
           setloader(false);
           RNRestart.restart();
         }
@@ -106,17 +112,22 @@ const URLAgent = ({ route }: DrawerProps) => {
       let Agents = await JSON.parse(res);
       let index: number = -1;
       for (let i = 0; i < Agents.length; i++) {
-        if (Agents[i]["Agent"] === Agent) {
+        if (Agents["URLAgents"][i]["Agent"] === Agent) {
           index = i;
-          console.log(Agents[i]["Agent"], "deleted");
+          console.log(Agents["URLAgents"][i]["Agent"], "deleted");
           break;
         }
       }
-      Agents.splice(index, 1);
+      Agents["URLAgents"].splice(index, 1);
       await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
-      const docRef = await addDoc(collection(db, "users", `${uid}/UserPreferences`), Agents);
+      // const docRef = await addDoc(collection(db, "users", `${uid}/UserPreferences`), Agents);
+      const docRef = collection(db, "users", `${uid}/UserPreferences`);
+      const docSnap = await getDocs(docRef);
+      const docref = doc(db, "users", `${uid}`, "UserPreferences", docSnap.docs[0].id);
+      await updateDoc(docref, Agents);
+        
       // navigation.dispatch(DrawerActions.jumpTo('AgentSelector'));
-      showToast ("success", "Agent Deleted!");
+      // showToast ("success", "Agent Deleted!");
       setdeleteloader(false);
       RNRestart.restart();
     }

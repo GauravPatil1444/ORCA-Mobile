@@ -35,16 +35,18 @@ const App = () => {
   const [Agents, setAgents] = useState<string[]>([]);
   const [URLAgents, setURLAgents] = useState<string[]>([]);
   const [dropdown, setdropdown] = useState('');
-  const [userData, setuserData] = useState<any[]>(["xyz","abc"]);
+  const [userData, setuserData] = useState<string[]>(["",""]);
 
   const startup = async () => {
     try{
       const path = RNFS.DocumentDirectoryPath + '/user_preferences.txt';
       const data = await RNFS.readFile(path, 'utf8');
       const Agents = await JSON.parse(data);
-      setuserData([Agents[0][0],Agents[0][1]]);
-      setAgents(Agents[1]);
-      setURLAgents(Agents[2])
+      console.log(Agents["UserDetails"]["email"]);
+      
+      setuserData([Agents["UserDetails"]["email"],Agents["UserDetails"]["name"]]);
+      setAgents(Agents["DocAgents"]);
+      setURLAgents(Agents["URLAgents"]);
     }
     catch{
       // navigation.dispatch(DrawerActions.jumpTo('Authentication'));

@@ -56,10 +56,10 @@ const ChatScreen = ({ route }: DrawerProps) => {
                 body: JSON.stringify({ "data": inp, "collection_name": Agent, "prompt": prompt === undefined ? "" : prompt })
             });
             const res = await response.json();
+            // console.log(200,response);
             setchatData(prevChatData => [...prevChatData, { "type": "system", "content": res["response"] }]);
             setloader(false);
-        } catch (e) {
-            // console.log(e);
+        } catch {
             showToast("error", "Something went wrong !");
             setedit(true);
             setloader(false);
