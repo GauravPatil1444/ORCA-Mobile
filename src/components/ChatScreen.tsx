@@ -16,6 +16,7 @@ const ChatScreen = ({ route }: DrawerProps) => {
     const [Agent, setAgent] = useState<string | undefined>('');
     const [prompt, setprompt] = useState<string | undefined>('');
     const [loader, setloader] = useState(false);
+    const [user, setuser] = useState<string | undefined>('')
 
     useEffect(() => {
         setsearchinp('');
@@ -24,6 +25,8 @@ const ChatScreen = ({ route }: DrawerProps) => {
     useEffect(() => {
         setAgent(route.params?.Agent);
         setprompt(route.params?.prompt);
+        setuser(route.params?.user?.split(' ')[0]);
+        
         setchatData([]);
         console.log(route.params?.Agent);
 
@@ -107,7 +110,7 @@ const ChatScreen = ({ route }: DrawerProps) => {
                             )}
                         </View>
                     )}
-                /> : <View style={{ flex: 1, paddingHorizontal: 15, alignItems: 'center', flexDirection: 'row', gap: 5 }}><Text style={{ fontSize: Dimensions.get('window').width / 12, marginLeft: Dimensions.get('window').width / 10 }}>Welcome,</Text><ScrollView horizontal={true}><Text style={{ color: 'rgb(38, 121, 255)', fontSize: Dimensions.get('window').width / 12 }}>Gaurav</Text></ScrollView></View>}
+                /> : <View style={{ flex: 1, paddingHorizontal: 15, alignItems: 'center', flexDirection: 'row', gap: 5 }}><Text style={{ fontSize: Dimensions.get('window').width / 12, marginLeft: Dimensions.get('window').width / 10 }}>Welcome,</Text><ScrollView horizontal={true}><Text style={{ color: 'rgb(38, 121, 255)', fontSize: Dimensions.get('window').width / 12 }}>{user}</Text></ScrollView></View>}
             </View>
             <KeyboardAvoidingView behavior='height' enabled={true} keyboardVerticalOffset={0} style={styles.keyboardAvoidingContainer}>
                 <View style={styles.inputContainer}>
@@ -125,11 +128,7 @@ const ChatScreen = ({ route }: DrawerProps) => {
                         onSubmitEditing={() => handleUserInput(searchinp)}
                     />
                     {!loader ? <TouchableOpacity style={styles.sendbtn} onPress={() => handleUserInput(searchinp)}>
-                        {searchinp.length !== 0 ? (
-                            <Image style={styles.sendIcon} source={require('../assets/send.png')} />
-                        ) : (
-                            <Image style={styles.sendIcon} source={require('../assets/mic.png')} />
-                        )}
+                        <Image style={styles.sendIcon} source={require('../assets/send.png')} />
                     </TouchableOpacity> : <ActivityIndicator
                         animating={true}
                         color={'#0073FF'}

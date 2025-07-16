@@ -12,20 +12,25 @@ import DocumentAgent from './components/DocumentAgent';
 import URLAgent from './components/URLAgent';
 import WebScreen from './components/WebScreen';
 import Authentication from './components/Authentication'
+import WebViewScreen from './components/WebViewScreen';
+import APIScreen from './components/APIScreen';
 import { useState, useEffect } from 'react';
 import RNFS from 'react-native-fs';
 import Toast from 'react-native-toast-message';
 import RNRestart from 'react-native-restart';
-import { useNavigation } from '@react-navigation/native';
+import { navigationRef } from './services/NavigationService';
+import { jumpTo } from './services/NavigationService';
 
 export type DrawerParamList = {
-  ChatScreen: { "Agent": string, "prompt": string } | undefined;
-  WebScreen: { "Agent":string,"link": string, "classes_to_remove": string };
+  ChatScreen: { "Agent": string, "prompt": string, "user": string|undefined } | undefined;
+  WebScreen: { "Agent":string,"link": string, "classes_to_remove": string, "user": string|undefined };
   SplashScreen: undefined;
   DocumentAgent: { "Agent": string, "prompt": string } | undefined;
   URLAgent: { "link": string | undefined, "Agent": string | undefined, "classes_to_remove": string } | undefined;
   AgentSelector: undefined;
   Authentication: undefined;
+  WebViewScreen: { "Agent":string,"link": string, "classes_to_remove": string, "searchinp": string|undefined};
+  APIScreen: undefined
 }
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
@@ -59,13 +64,17 @@ const App = () => {
     RNRestart.restart();
   }
 
+  const handleAPIScreenJump = ()=>{
+    jumpTo("APIScreen");
+  }
+
   useEffect(() => {
     startup();
   }, [])
 
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Drawer.Navigator
         initialRouteName="SplashScreen"
         backBehavior="history"
@@ -86,9 +95,16 @@ const App = () => {
                   </ScrollView>
                 </View>
                 <Text style={{ color: '#192A56', fontSize: 15, paddingLeft: 5 }}>{userData[0]}</Text>
-                <TouchableOpacity style={{ backgroundColor: 'rgba(135, 207, 235, 0.26)', width: '30%', padding: 10, alignItems: 'center', borderRadius: 8 }} onPress={()=>{Logout()}}>
-                  <Text style={{ color: '#192A56', fontSize: 15, fontWeight: 'bold' }}>Logout</Text>
-                </TouchableOpacity>
+                <View style={styles.profilebtnspace}>
+                  <TouchableOpacity style={styles.profilebtns} onPress={()=>{Logout()}}>
+                    <Text style={{ color: '#192A56', fontSize: 15, fontWeight: 'bold' }}>Logout</Text>
+                    <Image style={{width:16,height:16,tintColor:'#192A56'}} source={require('./assets/exit.png')}></Image>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.profilebtns} onPress={()=>{handleAPIScreenJump()}}>
+                    <Text style={{ color: '#192A56', fontSize: 15, fontWeight: 'bold' }}>APIs</Text>
+                    <Image style={{width:16,height:16,tintColor:'#192A56'}} source={require('./assets/plug.png')}></Image>
+                  </TouchableOpacity>
+                </View>
               </View>
               {/* <DrawerItemList {...props} /> */}
               <View style={{ height: '72%', alignItems: 'center', gap: 10 }}>
@@ -144,7 +160,7 @@ const App = () => {
                   maxToRenderPerBatch={10}
                   keyExtractor={(item, index) => index.toString()}
                   renderItem={({ item }: any) => (
-                    <TouchableOpacity style={styles.DrawerTabs} onPress={() => { item['Agent_type'] !== "Web_URLAgent" ? props.navigation.dispatch(DrawerActions.jumpTo('WebScreen', { "Agent": item["Agent"], "link": item["link"], "classes_to_remove": item["classes_to_remove"] })) : props.navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": item["Agent"], "prompt": "" })) }}>
+                    <TouchableOpacity style={styles.DrawerTabs} onPress={() => { item['Agent_type'] !== "Web_URLAgent" ? props.navigation.dispatch(DrawerActions.jumpTo('WebScreen', { "Agent": item["Agent"], "link": item["link"], "classes_to_remove": item["classes_to_remove"], "user": userData[1] })) : props.navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": item["Agent"], "prompt": "" })) }}>
                       <Image
                         style={{ width: 20, height: 20 }}
                         source={require("./assets/bot.png")}
@@ -280,6 +296,44 @@ const App = () => {
             )
           })}
         />
+        <Drawer.Screen
+          name="WebViewScreen"
+          component={WebViewScreen}
+          options={({route,navigation})=>({
+            title: route.params?.Agent,
+            headerShown: true,
+            drawerItemStyle: {
+              display: 'none',
+            },
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 15 }}>
+                <Image
+                  style={{ width: 22, height: 22, marginRight: 15, tintColor: '#192A56' }}
+                  source={require("./assets/back.png")}
+                />
+              </TouchableOpacity>
+            ),
+          })}
+        />
+        <Drawer.Screen
+          name="APIScreen"
+          component={APIScreen}
+          options={({navigation})=>({
+            headerShown: true,
+            title: "Integration APIs",
+            drawerItemStyle: {
+              display: 'none',
+            },
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())} style={{ marginLeft: 15 }}>
+                <Image
+                  style={{ width: 22, height: 22, marginRight: 15, tintColor: '#192A56' }}
+                  source={require("./assets/menu.png")}
+                />
+              </TouchableOpacity>
+            ),
+          })}
+        />
       </Drawer.Navigator>
       <Toast/>
     </NavigationContainer>
@@ -324,7 +378,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     width: '100%',
     height: 'auto'
+  },
+  profilebtnspace: {
+    flexDirection: 'row',
+    justifyContent:'space-between',
+  },
+  profilebtns:{ 
+    backgroundColor: 'rgba(135, 207, 235, 0.26)',
+    width: 'auto',
+    gap: 5,
+    padding: 10, 
+    alignItems: 'center', 
+    borderRadius: 8,
+    flexDirection: 'row' 
   }
+
 });
 
 export default App;

@@ -58,10 +58,12 @@ const URLAgent = ({ route }: DrawerProps) => {
           await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
           // const docRef = await addDoc(collection(db, "users", `${uid}/UserPreferences`), Agents);
           
+          const uid = firebase_auth.currentUser?.uid;
+
           const docRef = collection(db, "users", `${uid}/UserPreferences`);
           const docSnap = await getDocs(docRef);
           const docref = doc(db, "users", `${uid}`, "UserPreferences", docSnap.docs[0].id);
-          await updateDoc(docref, JSON.parse(Agents));
+          await updateDoc(docref, Agents);
           
           // navigation.dispatch(DrawerActions.jumpTo('WebScreen', { "link": link, "classes_to_remove": classes }))
           showToast("success", "Agent Deployed!");
@@ -70,7 +72,7 @@ const URLAgent = ({ route }: DrawerProps) => {
         }
       }
       catch (e) {
-        console.log(e);
+        // console.log(e);
         showToast("error", "Something went wrong !");
         setloader(false);
       }

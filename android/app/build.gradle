@@ -119,4 +119,5 @@ dependencies {
         implementation jscFlavor
     }
     implementation project(':react-native-restart')
+  
 }

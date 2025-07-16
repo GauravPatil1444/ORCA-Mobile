@@ -38,19 +38,20 @@ const SplashScreen = () => {
                 const path = RNFS.DocumentDirectoryPath + '/user_preferences.txt';
                 data = await RNFS.readFile(path, 'utf8');
                 const parsedData = await JSON.parse(data);
+                const user = parsedData["UserDetails"]["name"];
                 const Agents = parsedData["DocAgents"];
                 const URLAgents = parsedData["URLAgents"];
               
-                // console.log(parsedData);
+                // console.log(parsedData,user);
 
                 if (Agents.length == 0) {
                     if (URLAgents.length != 0) {
                         setvisited(true);
                         if (URLAgents[0]["classes_to_remove"] != "URL") {
-                            navigation.dispatch(DrawerActions.jumpTo('WebScreen', { "Agent": URLAgents[0]["Agent"], "link": URLAgents[0]["link"], "classes_to_remove": URLAgents[0]["classes_to_remove"] }));
+                            navigation.dispatch(DrawerActions.jumpTo('WebScreen', { "Agent": URLAgents[0]["Agent"], "link": URLAgents[0]["link"], "classes_to_remove": URLAgents[0]["classes_to_remove"], "user": user }));
                         }
                         else {
-                            navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": URLAgents[0]["Agent"], "prompt": URLAgents[0]["classes_to_remove"] }));
+                            navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": URLAgents[0]["Agent"], "prompt": URLAgents[0]["classes_to_remove"], "user": user }));
                         }
                     }
                     else {
@@ -60,7 +61,7 @@ const SplashScreen = () => {
                 }
                 else {
                     setvisited(true);
-                    navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": Agents[0]["Agent"], "prompt": Agents[0]["prompt"] }));
+                    navigation.dispatch(DrawerActions.jumpTo('ChatScreen', { "Agent": Agents[0]["Agent"], "prompt": Agents[0]["prompt"], "user": user }));
                 }
             }
             catch {
