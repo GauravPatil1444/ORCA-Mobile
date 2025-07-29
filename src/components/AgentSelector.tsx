@@ -14,11 +14,11 @@ const AgentSelector = () => {
 
   const HandleNext = async () => {
     if (Agenttype != null) {
-      console.log(Agenttype);
+      // console.log(Agenttype);
       navigation.dispatch(DrawerActions.jumpTo(Agenttype))
     }
     else {
-      console.log("Select Agent type first!");
+      // console.log("Select Agent type first!");
       showToast("info", "Select Agent type first!");
     }
   }
@@ -32,19 +32,7 @@ const AgentSelector = () => {
     });
   }
 
-  // useEffect(() => {
-  //   try{
-  //     const path = RNFS.DocumentDirectoryPath + '/user_preferences.txt';
-  //     const data:any = RNFS.readFile(path, 'utf8');
-  //     console.log(data.json())
-  //   }
-  //   catch{
-  //     navigation.dispatch(DrawerActions.jumpTo('Authentication'));     
-  //   }
   
-  // }, [])
-  
-
   return (
     <View style={{ flex: 1, alignItems: 'center', gap: 15 }}>
 

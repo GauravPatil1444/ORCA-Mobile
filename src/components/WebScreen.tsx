@@ -16,7 +16,6 @@ const WebScreen = ({ route }: DrawerProps) => {
     const [Agent, setAgent] = useState<any>('');
     const [classes_to_remove, setprompt] = useState<string | undefined>('');
     const [user, setuser] = useState<string | undefined>('')
-    const [invoke, setinvoke] = useState(false);
     const [link, setlink] = useState<string | undefined>('')
 
     const navigation = useNavigation();
@@ -66,7 +65,7 @@ const WebScreen = ({ route }: DrawerProps) => {
 
             // setchatData(prevChatData => [...prevChatData, { "type": "system", "content": res["response"] }]);
         } catch (e) {
-            console.log(e);
+            // console.log(e);
             setedit(true);
         }
     };
@@ -76,14 +75,9 @@ const WebScreen = ({ route }: DrawerProps) => {
             setedit(false);
             setchatData(prevChatData => [...prevChatData, { "content": inp }]);
             await requestorca();
-            setinvoke(false);
             setedit(true);
         }
     };
-
-    useEffect(() => {
-        setinvoke(false);
-    }, [searchinp])
 
 
     return (

@@ -3,7 +3,6 @@ import React from 'react'
 import RNFS from 'react-native-fs';
 import { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { DrawerActions } from '@react-navigation/native';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { DrawerParamList } from '../App';
 import Slider from '@react-native-community/slider';
@@ -11,7 +10,7 @@ import Toast from 'react-native-toast-message'
 import RNRestart from 'react-native-restart';
 import { firebase_auth } from '../../firebaseConfig'
 import { db } from '../../firebaseConfig';
-import { addDoc, collection, getDocs, updateDoc, doc } from 'firebase/firestore'
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore'
 
 type DrawerProps = DrawerScreenProps<DrawerParamList, 'URLAgent'>;
 
@@ -29,8 +28,6 @@ const URLAgent = ({ route }: DrawerProps) => {
 
   const uid = firebase_auth.currentUser?.uid;
 
-  const navigation = useNavigation();
-
   const save = async () => {
     // console.log(docs);
     if (link !== "") {
@@ -41,7 +38,7 @@ const URLAgent = ({ route }: DrawerProps) => {
         try {
           let res = await RNFS.readFile(path, 'utf8')
           Agents = JSON.parse(res);
-          console.log(typeof (Agents), Agents);
+          // console.log(typeof (Agents), Agents);
         }
         catch {
           Agents = [];
@@ -54,7 +51,7 @@ const URLAgent = ({ route }: DrawerProps) => {
             "classes_to_remove": classes
           }
           await Agents["URLAgents"].splice(0, 0, Agent_data);
-          console.log(Agents);
+          // console.log(Agents);
           await RNFS.writeFile(path, JSON.stringify(Agents), 'utf8');
           // const docRef = await addDoc(collection(db, "users", `${uid}/UserPreferences`), Agents);
           
@@ -101,7 +98,7 @@ const URLAgent = ({ route }: DrawerProps) => {
           },
           body: JSON.stringify({ "collection_name": Agent })
         });
-        console.log(response);
+        // console.log(response);
       }
       catch {
         setdeleteloader(false);
@@ -116,7 +113,7 @@ const URLAgent = ({ route }: DrawerProps) => {
       for (let i = 0; i < Agents.length; i++) {
         if (Agents["URLAgents"][i]["Agent"] === Agent) {
           index = i;
-          console.log(Agents["URLAgents"][i]["Agent"], "deleted");
+          // console.log(Agents["URLAgents"][i]["Agent"], "deleted");
           break;
         }
       }
@@ -154,7 +151,7 @@ const URLAgent = ({ route }: DrawerProps) => {
           body: JSON.stringify({ "link": link, "collection_name": Agent, "range": range, "overlap": overlap })
         });
         const res = await response.json();
-        console.log(res);
+        // console.log(res);
         const path = RNFS.DocumentDirectoryPath + '/URLAgents.txt';
         let Agents = [];
         try {
@@ -180,7 +177,7 @@ const URLAgent = ({ route }: DrawerProps) => {
         }
       }
       catch (e) {
-        console.log(e);
+        // console.log(e);
         showToast("error", "Something went wrong !");
         setloader(false);
       }
@@ -315,10 +312,10 @@ const URLAgent = ({ route }: DrawerProps) => {
       </View>}
 
       <TouchableOpacity disabled={loader} style={[styles.btn, { backgroundColor: 'rgba(69, 255, 85, 0.2)', width: '30%', height: 'auto' }]} onPress={() => handleConfirm()}>
-        {!loader ? <><Text style={{ color: 'rgb(1, 107, 10)', fontSize: 15, fontWeight: 'bold' }}>Confirm</Text>
+        {!loader ? <><Text style={{ color: 'rgb(1, 107, 10)', fontSize: 15, fontWeight: 'bold' }}>Deploy</Text>
           <Image
             style={{ width: 18, height: 18, tintColor: 'rgb(1, 107, 10)' }}
-            source={require("../assets/tick.png")}
+            source={require("../assets/rocket.png")}
           /></> :
           <ActivityIndicator
             animating={true}

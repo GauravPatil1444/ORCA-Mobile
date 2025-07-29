@@ -28,7 +28,7 @@ const ChatScreen = ({ route }: DrawerProps) => {
         setuser(route.params?.user?.split(' ')[0]);
         
         setchatData([]);
-        console.log(route.params?.Agent);
+        // console.log(route.params?.Agent);
 
     }, [route.params]);
 

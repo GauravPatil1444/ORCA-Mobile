@@ -13,7 +13,6 @@ const WebViewScreen = ({route}:DrawerProps) => {
   const [link, setlink] = useState<string|undefined>('');
   const [searchinp, setsearchinp] = useState<string|undefined>('');
   const [classes_to_remove, setclasses_to_remove] = useState<string|undefined>('');
-  const [invoke, setinvoke] = useState(false);
 
   useEffect(() => {
     setclasses_to_remove(route.params.classes_to_remove);

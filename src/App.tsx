@@ -87,7 +87,7 @@ const App = () => {
             <SafeAreaView style={{ flex: 1 }}>
               <View style={styles.profile}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <TouchableOpacity style={styles.logo}>
+                  <TouchableOpacity style={styles.logo} onPress={()=>Logout()}>
                     <Text style={{ color: 'white', fontSize: 25 }}>{userData[1][0]}</Text>
                   </TouchableOpacity>
                   <ScrollView horizontal={true}>

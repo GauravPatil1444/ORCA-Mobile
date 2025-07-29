@@ -27,7 +27,7 @@ const SplashScreen = () => {
         const response = fetch("https://orca-574216179276.asia-south1.run.app/", {
             method: 'GET',
         });
-        console.log(response);
+        // console.log(response);
         setfirstAnimation(true);
         setTimeout(() => {
             setsecondAnimation(true);

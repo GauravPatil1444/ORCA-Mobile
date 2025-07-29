@@ -107,7 +107,7 @@ const DocumentAgent = ({ route }: DrawerProps) => {
         formData.append('overlap', overlap);
         formData.append('regex', expression);
 
-        const response = await fetch('https://orca-574216179276.asia-south1.run.app/upload', {
+        const response = await fetch('https://ef4ecbd09506.ngrok-free.app/upload', {
           method: 'POST',
           body: formData,
           headers: {
@@ -248,6 +248,7 @@ const DocumentAgent = ({ route }: DrawerProps) => {
       setdeleteoption(false);
       setfileexists(false);
       setfilename('');
+      const res = fetch('https://ocr-1-0-0.onrender.com/');
     }
   }, [route.params])
 
@@ -374,10 +375,10 @@ const DocumentAgent = ({ route }: DrawerProps) => {
           </View>
         </>}
         <TouchableOpacity disabled={loader} style={[styles.btn, { backgroundColor: 'rgba(69, 255, 85, 0.2)', width: '30%', height: 'auto' }]} onPress={() => { HandleProcess() }}>
-          {!loader ? <><Text style={{ color: 'rgb(1, 107, 10)', fontSize: 15, fontWeight: 'bold' }}>Confirm</Text>
+          {!loader ? <><Text style={{ color: 'rgb(1, 107, 10)', fontSize: 15, fontWeight: 'bold' }}>Deploy</Text>
             <Image
               style={{ width: 18, height: 18, tintColor: 'rgb(1, 107, 10)' }}
-              source={require("../assets/tick.png")}
+              source={require("../assets/rocket.png")}
             /></> :
             <ActivityIndicator
               animating={true}

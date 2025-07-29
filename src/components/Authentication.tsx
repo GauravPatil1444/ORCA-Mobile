@@ -5,9 +5,6 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "fire
 import { firebase_auth } from '../../firebaseConfig'
 import { addDoc, collection, getDocs } from 'firebase/firestore'
 import { db } from '../../firebaseConfig'
-// import auth from '@react-native-firebase/auth';
-// import EncryptedStorage4 from 'react-native-encrypted-storage'
-// import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
 import Toast from 'react-native-toast-message'
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -18,7 +15,6 @@ type DrawerProps = DrawerScreenProps<DrawerParamList, 'Authentication'>;
 
 const Login = ({ navigation }: DrawerProps) => {
 
-    const [emailclick, setemailclick] = useState(false)
     const [inp1width, setinp1width] = useState(1)
     const [inp2width, setinp2width] = useState(1)
     const [inp3width, setinp3width] = useState(1)
@@ -97,7 +93,7 @@ const Login = ({ navigation }: DrawerProps) => {
             const docRef = collection(db, "users", `${user_id}/UserPreferences`);
             const docSnap = await getDocs(docRef);
 
-            console.log(docSnap.docs[0].data());
+            // console.log(docSnap.docs[0].data());
             const path = RNFS.DocumentDirectoryPath + '/user_preferences.txt';
             await RNFS.writeFile(path, JSON.stringify(docSnap.docs[0].data()), 'utf8')
 
